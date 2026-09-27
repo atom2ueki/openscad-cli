@@ -110,7 +110,7 @@ jobs:
             cmake ninja-build pkg-config libboost-regex-dev libboost-program-options-dev \
             libeigen3-dev libcgal-dev libgmp-dev libmpfr-dev libcairo2-dev libglib2.0-dev \
             libfreetype-dev libzip-dev libxml2-dev libfontconfig-dev libharfbuzz-dev \
-            libdouble-conversion-dev libtbb-dev flex bison lib3mf-dev
+            libdouble-conversion-dev libtbb-dev flex bison lib3mf-dev gettext
           packaging/build-engine.sh full
           mkdir -p "openscad-cli-$VERSION-linux-${{ matrix.arch }}"
           cp -R dist build packaging skill LICENSE NOTICE THIRD_PARTY_LICENSES.md README.md \

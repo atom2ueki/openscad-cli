@@ -81,6 +81,10 @@ jobs:
       # version resolves to the empty string and the configure step dies with
       # "Required version (1.14) is higher than found version ()" — a message
       # that reads like a version problem and is really a missing package.
+      #
+      # gettext is not optional either: the engine's `openscad` target runs
+      # msgfmt over the .po catalogues, so without it the build dies at the
+      # final link step with "msgfmt: command not found" and error 127.
       - name: install engine build dependencies (linux)
         if: runner.os == 'Linux'
         run: |
@@ -92,7 +96,7 @@ jobs:
             libcairo2-dev \
             libglib2.0-dev libfreetype-dev libzip-dev libxml2-dev \
             libfontconfig-dev libharfbuzz-dev libdouble-conversion-dev \
-            libtbb-dev flex bison lib3mf-dev
+            libtbb-dev flex bison lib3mf-dev gettext
 
       # `cairo` for the same reason as libcairo2-dev above: it is what keeps
       # PDF export compiled in (ENABLE_CAIRO gates export_pdf.cc).

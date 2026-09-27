@@ -28,15 +28,19 @@
 #       libboost-program-options-dev libeigen3-dev libcgal-dev libgmp-dev \
 #       libmpfr-dev libcairo2-dev libglib2.0-dev libfreetype-dev libzip-dev \
 #       libxml2-dev libfontconfig-dev libharfbuzz-dev libdouble-conversion-dev \
-#       libtbb-dev flex bison lib3mf-dev
+#       libtbb-dev flex bison lib3mf-dev gettext
 #
-# Two of those packages are load-bearing in a way that is easy to get wrong:
+# Three of those packages are load-bearing in a way that is easy to get wrong:
 #
 #   cairo      FindCairo.cmake parses cairo-version.h to satisfy
 #              `find_package(Cairo 1.14)`. A runtime-only cairo leaves the
 #              version empty and the configure step fails with "Required
 #              version (1.14) is higher than found version ()". Cairo gates
 #              export_pdf.cc, so losing it silently costs PDF export.
+#   gettext    The `openscad` target shells out to msgfmt via
+#              scripts/translation-update.sh to compile the .po catalogues.
+#              Without it the link step dies with a bare "msgfmt: command
+#              not found" and error 127, which reads like a linker fault.
 #   lib3mf     Removed from homebrew-core, so it cannot be installed from a
 #              formula on macOS at all. It is linked when the platform
 #              provides it (Debian/Ubuntu) and omitted otherwise, which is
@@ -70,9 +74,14 @@ COMMON_ARGS=(
   -DUSE_CCACHE=ON
   -DUSE_BUILTIN_MANIFOLD=ON
   -DUSE_BUILTIN_CLIPPER2=ON
-  -DENABLE_TESTS=ON
   # The engine's own ctest suite is wired for image comparison, which is
-  # meaningless without a GL context; our tests live in test/ instead.
+  # meaningless without a GL context; our tests live in test/ instead. It is
+  # also not merely useless here, it is fatal: tests/CMakeLists.txt disables a
+  # test called `export-3mf-stdio_3mf-export` on APPLE, and that test only
+  # exists when lib3mf was found — so on a macOS runner without lib3mf,
+  # set_tests_properties() names a test that is not in the suite and CMake
+  # stops with "set_tests_properties ... cannot find test".
+  -DENABLE_TESTS=OFF
   -DINFO=ON
   # lib3mf is optional on purpose, and this is the line that makes it so.
   # The engine defaults CMAKE_REQUIRE_FIND_PACKAGE_Lib3MF to ON, so a
