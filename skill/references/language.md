@@ -81,6 +81,41 @@ hull()  { children(); }            // convex hull of all children
 minkowski() { children(); }        // slow; keep the operands tiny
 ```
 
+## Trigonometry
+
+**`sin`, `cos`, `tan`, `asin`, `acos` and `atan` take and return DEGREES on this
+engine, while the `PI` constant is the radian pi.** Stock OpenSCAD uses radians
+for both. This is the single most damaging difference between the two, because
+nothing reports it: the model renders, the mesh is watertight, and the shape is
+wrong.
+
+```openscad
+echo(cos(180), cos(360), sin(90), acos(0.5));
+// this engine:     -1,  1,        1,       60
+// stock OpenSCAD:  -0.59846, -0.283691, 0.893997, 1.047198
+```
+
+`rotate`, `$fa`, `$fs` and everything else angle-shaped were always degrees and
+are unaffected — only the trig functions moved.
+
+Write the model in radians and convert at the boundary:
+
+```openscad
+TRIG_DEGREES = true;                // false for stock OpenSCAD
+function to_engine(a)   = TRIG_DEGREES ? a * 180 / PI : a;
+function from_engine(a) = TRIG_DEGREES ? a * PI / 180 : a;
+function sin_r(a)  = sin(to_engine(a));
+function cos_r(a)  = cos(to_engine(a));
+function tan_r(a)  = tan(to_engine(a));
+function acos_r(x) = from_engine(acos(x));
+```
+
+Angle-only formulae are the trap. The involute function `tan(a) - a` is only
+valid in radians, and the wrapper does not save you: `tan(to_engine(a)) - a`
+converts only the first term, and `tan(to_engine(a)) - a` is the correct form
+while `tan(a) - a` is not. Degrees in one term and radians in the other looks
+entirely reasonable and is not.
+
 ## Boolean operations
 
 ```openscad
@@ -89,11 +124,20 @@ difference()  { children(); }   // first minus the rest
 intersection(){ children(); }   // all of them
 ```
 
-The most common failure: subtracting a shape that only *touches* the target
-along a face or an edge. There is no overlap to cut, so the result is
-non-manifold. Nudge the cutter so it genuinely overlaps — extend it by 1 mm
-past each face, which is what the `translate([0,0,-1]) cube(...)` idiom in the
-tray example does.
+Two distinct touching problems, opposite in cause:
+
+- A cutter that only *touches* the target along a face or an edge has no
+  overlap to cut, so the result is non-manifold. Nudge the cutter so it
+  genuinely overlaps — extend it 1 mm past each face, which is what the
+  `translate([0,0,-1]) cube(...)` idiom in the tray example does. A cutter
+  positioned entirely outside the part is the same mistake taken further: it
+  cuts nothing, and the parameter that was supposed to matter does nothing.
+- Two *cutters* that share a surface exactly should not be `union`ed with each
+  other. Union the bore cylinder and a chamfer cone narrowing to the same bore
+  radius and their coincident faces have no unambiguous answer; the result is a
+  valid-looking mesh whose bore is neither straight nor chamfered. List them as
+  separate children of `difference()` instead, so each is subtracted
+  independently.
 
 ## Extrusion
 
@@ -158,3 +202,9 @@ Give every dimension a range.
 - `if (false)` from a `-D` value that fell outside the intended range.
 - A subtraction that removed everything (you get `geometry.empty`).
 - `include` of a file whose top-level code produced geometry you did not want.
+- A cutter positioned entirely outside the part it was meant to cut.
+- A chamfer or fillet whose cone runs to the wrong end, so it clears the
+  material instead of biting into it.
+- `cos(angle)` computed under the wrong convention — still a number, still a
+  valid mesh, wrong shape.
+- A 2D export from a 3D-only model: the engine exits 1 and prints nothing.
