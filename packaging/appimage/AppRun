@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2026 the openscad-cli authors
+#
+# AppRun for the openscad-cli AppImage.
+#
+# An AppImage is a single self-contained file: the CLI, the headless engine and
+# every shared library live inside it, and the user's machine needs no package
+# manager. This is the Linux distribution channel, mirroring what OpenSCAD
+# itself ships.
+#
+# The AppImage deliberately contains no OpenGL and no display dependency.
+
+HERE="$(dirname "$(readlink -f "$0")")"
+export PATH="$HERE/usr/bin:$PATH"
+
+# The engine is bundled next to the CLI. Pointing OPENSCAD_ENGINE at it removes
+# any dependence on whatever `openscad` might be installed on the host.
+if [ -x "$HERE/usr/bin/openscad" ]; then
+  export OPENSCAD_ENGINE="$HERE/usr/bin/openscad"
+  export OPENSCADPATH="$HERE/usr/share/openscad/libraries"
+fi
+
+# Nothing here needs a display; make that explicit so a stray DISPLAY cannot
+# change behaviour.
+unset DISPLAY WAYLAND_DISPLAY
+
+exec "$HERE/usr/bin/openscad-cli" "$@"

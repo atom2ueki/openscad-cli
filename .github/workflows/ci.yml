@@ -1,0 +1,135 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2026 the openscad-cli authors
+name: ci
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Fast feedback: the CLI itself, with no engine required. A fake engine
+  # stands in for OpenSCAD so the whole suite runs in seconds.
+  cli:
+    name: cli (no engine)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run compliance
+
+  # The real thing: build the headless engine, then run the integration suite
+  # against it. This is the job that proves the engine contract.
+  engine:
+    name: engine (${{ matrix.os }}-${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            os: linux
+            arch: x64
+            profile: full
+          - runner: ubuntu-24.04-arm
+            os: linux
+            arch: arm64
+            profile: full
+          - runner: macos-14
+            os: darwin
+            arch: arm64
+            profile: full
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # Fail loudly if the engine submodule moved without a deliberate bump.
+      - name: verify engine pin
+        run: |
+          EXPECTED=$(git ls-files -s engine | awk '{print $2}')
+          ACTUAL=$(git -C engine rev-parse HEAD)
+          echo "pinned:   $EXPECTED"
+          echo "checked:  $ACTUAL"
+          test "$EXPECTED" = "$ACTUAL" || {
+            echo "::error::engine submodule moved; bump it deliberately in a reviewed commit"
+            exit 1
+          }
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      - name: install engine build dependencies (linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            cmake ninja-build pkg-config \
+            libboost-regex-dev libboost-program-options-dev \
+            libeigen3-dev libcgal-dev libgmp-dev libmpfr-dev \
+            libglib2.0-dev libfreetype-dev libzip-dev libxml2-dev \
+            libfontconfig-dev libharfbuzz-dev libdouble-conversion-dev \
+            libtbb-dev flex bison lib3mf-dev
+
+      - name: install engine build dependencies (macos)
+        if: runner.os == 'macOS'
+        run: |
+          brew update
+          brew install cmake ninja pkg-config boost eigen cgal glib freetype \
+            libzip libxml2 fontconfig harfbuzz lib3mf double-conversion tbb catch2 ccache
+
+      - name: cache ccache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ccache
+          key: ccache-${{ matrix.os }}-${{ matrix.arch }}-${{ hashFiles('engine/CMakeLists.txt') }}
+          restore-keys: ccache-${{ matrix.os }}-${{ matrix.arch }}-
+
+      - name: build headless engine
+        run: JOBS=4 packaging/build-engine.sh ${{ matrix.profile }}
+
+      - name: locate the built engine
+        id: engine
+        run: |
+          BIN=$(find build/engine -maxdepth 3 -type f -name 'openscad*' -perm +111 | head -1)
+          test -n "$BIN" || { echo "::error::no engine binary"; exit 1; }
+          echo "path=$PWD/$BIN" >> "$GITHUB_OUTPUT"
+          "$BIN" --version
+
+      - name: integration tests
+        env:
+          OPENSCAD_ENGINE: ${{ steps.engine.outputs.path }}
+          OPENSCAD_ENGINE_SHA: ${{ github.sha }}
+        run: npm run test:integration
+
+      - name: the engine must be genuinely headless
+        env:
+          OPENSCAD_ENGINE: ${{ steps.engine.outputs.path }}
+        run: |
+          # A GUI build would need a display; this must pass with none.
+          env -u DISPLAY node dist/cli.js doctor
+          # PNG is impossible under NULLGL: assert the CLI says so rather than
+          # discovering it when a user asks for a preview.
+          node dist/cli.js info | node -e "
+            let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{
+              const i=JSON.parse(s);
+              if(i.capabilities.png!==false){console.error('expected png:false');process.exit(1);}
+              if(!i.license.spdx.includes('GPL')){console.error('missing license');process.exit(1);}
+              console.log('capabilities ok');
+            });"

@@ -1,0 +1,102 @@
+# ---------------------------------------------------------------------------
+# openscad-cli — what must never be committed, and why
+# ---------------------------------------------------------------------------
+
+# Local development toolchain and the OpenSCAD engine stand-in.
+# `.tools/` holds a private Node.js runtime and an unpacked ~180 MB OpenSCAD.app
+# plus the downloaded .dmg. It is the single largest thing in a working tree and
+# must never enter git. It is also disposable: re-created by
+# `.tools/env.sh` plus the engine download, and replaced entirely once Homebrew
+# can build the pinned engine.
+.tools/
+
+# ---------------------------------------------------------------------------
+# Build output
+# ---------------------------------------------------------------------------
+# `dist/` is emitted by `npm run build` and is reproducible from `src/`.
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# The engine submodule is built in place; its output is not source.
+/engine/build/
+/engine/*.scad.out
+
+# ---------------------------------------------------------------------------
+# Node
+# ---------------------------------------------------------------------------
+# package-lock.json IS committed on purpose: without it `npm ci` is not
+# reproducible, and reproducibility is the point of this project.
+node_modules/
+npm-debug.log*
+*.log
+
+# ---------------------------------------------------------------------------
+# Engine submodule
+# ---------------------------------------------------------------------------
+# The gitlink under engine/ — the recorded commit SHA — is what pins the
+# engine, so /engine/ is deliberately NOT ignored. Only local build output
+# inside the submodule is excluded above.
+/packaging/patches/applied/
+
+# ---------------------------------------------------------------------------
+# Run artifacts
+# ---------------------------------------------------------------------------
+# Everything the CLI produces at runtime: work directories, sidecar manifests,
+# and exported geometry. These are outputs of a model, never inputs.
+.openscad-cli/
+*.openscad.json
+*.stl
+*.off
+*.obj
+*.wrl
+*.3mf
+*.dxf
+*.svg
+*.pdf
+*.csg
+*.ast
+*.echo
+*.param
+*.pov
+
+# ...except small fixtures, which are inputs and belong in version control so
+# the import() tests are reproducible. Add fixture assets under
+# test/fixtures/assets/ and re-include them here.
+!test/fixtures/assets/*.stl
+!test/fixtures/assets/*.off
+!test/fixtures/assets/*.obj
+!test/fixtures/assets/*.svg
+!test/fixtures/assets/*.3mf
+
+# ---------------------------------------------------------------------------
+# Release artifacts — these are published, not committed.
+# Compliance check 9 fails the release if a binary ever lands in git.
+/packaging/appimage/build/
+*.AppImage
+*.dmg
+*.tar.gz
+*.zip
+*.wasm
+
+# ---------------------------------------------------------------------------
+# Secrets
+# ---------------------------------------------------------------------------
+# This project has no runtime configuration and talks to no service, so there
+# is nothing to authenticate against. These entries are defensive: if a future
+# change ever needs a token, it must reach the machine and never the repo.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa*
+.netrc
+.npmrc
+
+# ---------------------------------------------------------------------------
+# OS
+# ---------------------------------------------------------------------------
+.DS_Store
+Thumbs.db

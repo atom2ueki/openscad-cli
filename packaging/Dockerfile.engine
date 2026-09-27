@@ -1,0 +1,74 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2026 the openscad-cli authors
+#
+# Container image for openscad-cli plus a headless OpenSCAD engine.
+#
+#   docker build -f packaging/Dockerfile.engine -t openscad-cli .
+#   docker run --rm -v "$PWD:/work" openscad-cli build model.scad -o out.stl
+#
+# The image is entirely CPU-only: no X server, no Xvfb, no EGL. PNG rendering
+# is not available, by design.
+#
+# Both linux/amd64 and linux/arm64 are supported, which is also the only place
+# where a future PNG path could be added, because Qt's offscreen surfaces work
+# on X11/EGL but not on headless macOS.
+
+# ---- build stage: the engine needs a full toolchain ------------------------
+FROM debian:bookworm-slim AS engine-build
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      ca-certificates git cmake ninja-build pkg-config g++ make \
+      libboost-regex-dev libboost-program-options-dev \
+      libeigen3-dev libcgal-dev libgmp-dev libmpfr-dev \
+      libglib2.0-dev libfreetype-dev libzip-dev libxml2-dev \
+      libfontconfig-dev libharfbuzz-dev libdouble-conversion-dev \
+      libtbb-dev flex bison \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src
+COPY . /src
+
+# Recursive checkout of the pinned engine and its submodules.
+RUN git submodule update --init --recursive
+
+RUN JOBS=4 packaging/build-engine.sh full
+
+# ---- runtime stage: no compiler, no sources -------------------------------
+FROM node:22-bookworm-slim AS runtime
+
+ENV DEBIAN_FRONTEND=noninteractive
+# Runtime libraries for the engine binary. Keep this list in step with the
+# one in the build stage, minus everything that is only needed to compile.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      libboost-regex1.74.0 libboost-program-options1.74.0 \
+      libeigen3-dev libcgal10 libgmp10 libmpfr6 \
+      libglib2.0-0 libfreetype6 libzip4 libxml2 \
+      libfontconfig1 libharfbuzz0b libdouble-conversion3 \
+      libtbb12 flex bison \
+      openscad \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/openscad-cli
+COPY --from=engine-build /src/dist ./dist
+COPY --from=engine-build /src/skill ./skill
+COPY --from=engine-build /src/package.json ./package.json
+COPY --from=engine-build /src/LICENSE ./LICENSE
+COPY --from=engine-build /src/NOTICE ./NOTICE
+COPY --from=engine-build /src/THIRD_PARTY_LICENSES.md ./THIRD_PARTY_LICENSES.md
+
+# The headless engine built in the previous stage takes precedence over the
+# distribution's openscad package, which may be GUI-enabled.
+COPY --from=engine-build /src/build/engine/usr/local/bin/openscad /usr/local/bin/openscad-headless
+COPY --from=engine-build /src/build/engine/usr/local/libraries /usr/local/libraries
+
+ENV OPENSCAD_ENGINE=/usr/local/bin/openscad-headless
+RUN ln -sf /usr/local/bin/openscad-headless /usr/local/bin/openscad
+
+# The npm package is pure JavaScript, so this is just the CLI and the skill.
+RUN npm install --omit=dev --ignore-scripts \
+    && ln -sf /opt/openscad-cli/dist/cli.js /usr/local/bin/openscad-cli
+
+WORKDIR /work
+ENTRYPOINT ["openscad-cli"]
+CMD ["--help"]

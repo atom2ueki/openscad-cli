@@ -1,0 +1,56 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2026 the openscad-cli authors
+name: compliance
+
+# The GPL-2.0 gate. Runs on every change and blocks the release job; it is a
+# separate workflow so a legal-compliance failure is visible as such rather
+# than buried in a build log.
+on:
+  push:
+    branches: [main, master]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  gate:
+    name: GPL-2.0 compliance
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: licence headers and the nine compliance checks
+        run: npm run compliance
+
+      - name: the corresponding source must actually build
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./package.json').version")
+          packaging/make-source-tarball.sh "$VERSION" dist
+          echo "==> verifying the source bundle contains the engine"
+          mkdir -p /tmp/verify && tar -xzf "dist/openscad-cli-$VERSION-src.tar.gz" -C /tmp/verify
+          ROOT="/tmp/verify/openscad-cli-$VERSION"
+          test -f "$ROOT/package.json"              || { echo "::error::CLI sources missing"; exit 1; }
+          test -f "$ROOT/engine/CMakeLists.txt"     || { echo "::error::engine sources missing from the bundle"; exit 1; }
+          test -f "$ROOT/engine/COPYING"            || { echo "::error::engine licence missing"; exit 1; }
+          test -f "$ROOT/LICENSE"                    || { echo "::error::LICENSE missing"; exit 1; }
+          test -f "$ROOT/MANIFEST"                  || { echo "::error::MANIFEST missing"; exit 1; }
+          grep -q "commit" "$ROOT/MANIFEST"         || { echo "::error::MANIFEST does not record the engine commit"; exit 1; }
+          echo "source bundle is complete"
+
+      - name: no binary is committed to the repository
+        run: |
+          set -euo pipefail
+          # Shipping a prebuilt engine in git would break the "source is the
+          # deliverable" model and double the repository size.
+          if git ls-files | grep -Ei '\.(stl|off|3mf|dxf|dmg|zip|tar\.gz|wasm)$' ; then
+            echo "::error::binary artifacts are tracked in git"
+            exit 1
+          fi
+          echo "no binaries tracked"

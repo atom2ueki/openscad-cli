@@ -1,0 +1,400 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+// Copyright (C) 2026 the openscad-cli authors
+//
+// inspect, convert, info, doctor, skill and raw — the read-only and
+// introspection half of the command surface.
+
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { optBoolean, optString, type ParsedArgs } from '../args.js';
+import { CliError, EXIT } from '../exit.js';
+import { ALL_FORMATS, INTENTIONALLY_UNSUPPORTED, extensionOf, MESH_FORMATS, parseFormat, VECTOR_2D_FORMATS, type Format } from '../engine/flags.js';
+import { engineSearchReport, isMacAppBundle, readEngineVersion, resolveEngine } from '../engine/locate.js';
+import { guessMcadPath, invokeEngine } from '../engine/invoke.js';
+import { parseStderr } from '../diagnostics/parse.js';
+import { knownCodes } from '../diagnostics/codes.js';
+import { emitResult } from '../output.js';
+import { EXIT as EXIT_CODES, EXIT_MEANING } from '../exit.js';
+import { LICENSE_SPDX, RESULT_SCHEMA, SOURCE_URL, type BuildResult } from '../types.js';
+import { fileExists } from '../util/fsx.js';
+import { makeContext, requirePositional } from './context.js';
+
+function resolveInput(args: ParsedArgs): string {
+  const input = requirePositional(args, 0, 'an input .scad file');
+  const resolved = path.resolve(input);
+  if (!fileExists(resolved)) throw new CliError(EXIT.USAGE, `Input file not found: ${resolved}`);
+  return resolved;
+}
+
+/**
+ * inspect exposes the engine's own language-level dumps. Each of these is a
+ * normal export format, so they need no special engine support — they just
+ * write a text artifact instead of a mesh.
+ */
+export async function cmdInspect(args: ParsedArgs): Promise<number> {
+  const inputPath = resolveInput(args);
+
+  const kinds: Array<[string, Format]> = [
+    ['--ast', 'ast'],
+    ['--csg', 'csg'],
+    ['--echo', 'echo'],
+    ['--params', 'param'],
+  ];
+  const selected = kinds.filter(([flag]) => optBoolean(args, flag));
+  if (selected.length === 0) {
+    throw new CliError(EXIT.USAGE, `inspect needs one of: ${kinds.map(([f]) => f).join(', ')}`);
+  }
+
+  const ctx = await makeContext(args, path.dirname(inputPath));
+  const results: BuildResult[] = [];
+
+  for (const [flag, format] of selected) {
+    const outDir = optString(args, '--out-dir');
+    const target = outDir
+      ? path.join(path.resolve(outDir), `${path.basename(inputPath).replace(/\.scad$/, '')}${extensionOf(format)}`)
+      : path.join(path.dirname(inputPath), `${path.basename(inputPath).replace(/\.scad$/, '')}${extensionOf(format)}`);
+
+    // These dumps are the point of the command, so they are always written and
+    // never cached: a stale AST would be worse than no AST.
+    const { runBuild } = await import('../run.js');
+    const result = await runBuild({
+      engine: ctx.engine,
+      engineInfo: ctx.engineInfo,
+      inputPath,
+      outputPath: target,
+      format,
+      backend: 'manifold',
+      defines: args.defines,
+      strict: optBoolean(args, '--strict'),
+      quiet: ctx.quiet,
+      verbose: ctx.verbose,
+      timeoutMs: ctx.timeoutMs,
+      workdirRoot: path.join(path.dirname(inputPath), '.openscad-cli'),
+      useCache: false,
+      verifyMesh: false,
+      maxDimension: 0,
+      maxTriangles: 0,
+      minArea: 0,
+      keepWorkdir: false,
+      keepFailed: false,
+      command: `inspect ${flag}`,
+      dryRun: false,
+    });
+
+    results.push(result);
+
+    if (args.outputFormat === 'text' && result.status !== 'error') {
+      const text = fs.existsSync(target) ? fs.readFileSync(target, 'utf8') : '';
+      process.stdout.write(`# ${flag} -> ${target}\n${text}\n`);
+    }
+  }
+
+  if (args.outputFormat === 'json') {
+    const payload = results.length === 1 ? results[0] : { schema: RESULT_SCHEMA, results };
+    process.stdout.write(`${JSON.stringify(payload, null, 2)}\n`);
+  }
+
+  const failed = results.some((r) => r.status === 'error');
+  return failed ? EXIT_CODES.MODEL_ERROR : EXIT_CODES.OK;
+}
+
+/**
+ * convert re-exports an existing mesh or drawing through the engine. The
+ * generated wrapper imports the source and re-exports it, which is the only
+ * way OpenSCAD can change file format.
+ */
+export async function cmdConvert(args: ParsedArgs): Promise<number> {
+  const inputPath = resolveInput(args);
+  const format: Format = parseFormat(optString(args, '--format') ?? 'stl');
+
+  const explicitOut = optString(args, '-o') ?? optString(args, '--o') ?? optString(args, '--output');
+  const outputPath = explicitOut
+    ? path.resolve(explicitOut)
+    : inputPath.replace(/\.[^.]+$/, '') + extensionOf(format);
+
+  const workdir = path.join(path.dirname(inputPath), '.openscad-cli', 'convert');
+  fs.mkdirSync(workdir, { recursive: true });
+
+  const wrapper = path.join(workdir, `convert_${path.basename(inputPath)}`);
+  const importPath = inputPath.replace(/\\/g, '/');
+  fs.writeFileSync(wrapper, `// generated by openscad-cli convert\nimport("${importPath}", convexity=10);\n`);
+
+  const ctx = await makeContext(args, outputPath);
+  const { runBuild } = await import('../run.js');
+  const result = await runBuild({
+    engine: ctx.engine,
+    engineInfo: ctx.engineInfo,
+    inputPath: wrapper,
+    outputPath,
+    format,
+    backend: 'manifold',
+    defines: args.defines,
+    strict: optBoolean(args, '--strict'),
+    quiet: ctx.quiet,
+    verbose: ctx.verbose,
+    timeoutMs: ctx.timeoutMs,
+    workdirRoot: workdir,
+    useCache: ctx.useCache,
+    verifyMesh: MESH_FORMATS.has(format),
+    maxDimension: 0,
+    maxTriangles: 0,
+    minArea: 1e-9,
+    keepWorkdir: false,
+    keepFailed: false,
+    command: 'convert',
+    dryRun: false,
+  });
+
+  emitResult(result, args.outputFormat);
+  try {
+    fs.unlinkSync(wrapper);
+  } catch {
+    /* best effort */
+  }
+  return result.status === 'error' ? EXIT_CODES.MODEL_ERROR : EXIT_CODES.OK;
+}
+
+/** info reports the engine's real capabilities without relying on `--info`. */
+export async function cmdInfo(args: ParsedArgs): Promise<number> {
+  const explicit = optString(args, '--engine');
+  let enginePath: string;
+  let source: string;
+  try {
+    const resolved = resolveEngine(explicit);
+    enginePath = resolved.path;
+    source = resolved.source;
+  } catch (err) {
+    if (args.outputFormat === 'json') {
+      process.stdout.write(
+        `${JSON.stringify(
+          {
+            schema: 'openscad-cli/info@1',
+            status: 'error',
+            exitCode: EXIT_CODES.ENGINE_UNAVAILABLE,
+            message: err instanceof Error ? err.message : String(err),
+            search: engineSearchReport(),
+          },
+          null,
+          2,
+        )}\n`,
+      );
+    } else {
+      process.stderr.write(`${err instanceof Error ? err.message : String(err)}\n`);
+    }
+    return EXIT_CODES.ENGINE_UNAVAILABLE;
+  }
+
+  const version = readEngineVersion(enginePath) ?? 'unknown';
+  const mcad = guessMcadPath(enginePath);
+
+  const info = {
+    schema: 'openscad-cli/info@1',
+    status: 'ok',
+    cli: { name: 'openscad-cli', version: readCliVersion() },
+    engine: {
+      path: enginePath,
+      source,
+      version,
+      isMacAppBundle: isMacAppBundle(enginePath),
+      mcadPath: mcad ?? null,
+    },
+    platform: { platform: process.platform, arch: process.arch, node: process.version },
+    formats: {
+      supported: ALL_FORMATS,
+      mesh: [...MESH_FORMATS],
+      vector2d: [...VECTOR_2D_FORMATS],
+    },
+    capabilities: {
+      png: false,
+      pngReason:
+        'PNG export requires an OpenGL context. This CLI targets a headless (NULLGL) engine, which stubs PNG out.',
+      gl: false,
+      livePreview: false,
+      animation: false,
+      csgBackends: ['manifold', 'cgal'],
+    },
+    unsupported: INTENTIONALLY_UNSUPPORTED,
+    diagnosticCodes: knownCodes(),
+    exitCodes: EXIT_MEANING,
+    license: { spdx: LICENSE_SPDX, source: SOURCE_URL, engineLicense: 'GPL-2.0-or-later' },
+  };
+
+  process.stdout.write(`${JSON.stringify(info, null, 2)}\n`);
+  return EXIT_CODES.OK;
+}
+
+/** doctor answers "why is this not working?" without changing anything. */
+export async function cmdDoctor(args: ParsedArgs): Promise<number> {
+  const checks: Array<{ name: string; ok: boolean; detail: string }> = [];
+
+  let enginePath = '';
+  let engineVersion = 'unknown';
+  try {
+    const resolved = resolveEngine(optString(args, '--engine'));
+    enginePath = resolved.path;
+    engineVersion = readEngineVersion(enginePath) ?? 'unknown';
+    checks.push({
+      name: 'engine-found',
+      ok: true,
+      detail: `${resolved.path} (via ${resolved.source}), version ${engineVersion}`,
+    });
+  } catch (err) {
+    checks.push({
+      name: 'engine-found',
+      ok: false,
+      detail: err instanceof Error ? err.message.split('\n')[0]! : String(err),
+    });
+  }
+
+  checks.push({
+    name: 'node-version',
+    ok: Number(process.versions.node.split('.')[0]) >= 20,
+    detail: process.version,
+  });
+
+  if (enginePath) {
+    const probeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'openscad-cli-doctor-'));
+    try {
+      const out = path.join(probeDir, 'probe.off');
+      const probe = path.join(probeDir, 'probe.scad');
+      fs.writeFileSync(probe, 'cube(1);\n');
+      const run = await invokeEngine({
+        enginePath,
+        argv: ['--export-format', 'off', '--backend', 'manifold', '--quiet', '-o', out, probe],
+        cwd: probeDir,
+        timeoutMs: 60_000,
+      });
+      checks.push({
+        name: 'engine-runs-headless',
+        ok: run.exitCode === 0 && fileExists(out),
+        detail:
+          run.exitCode === 0
+            ? `rendered a test cube in ${run.durationMs} ms with no display`
+            : `engine exited ${run.exitCode}: ${run.stderr.split('\n')[0] ?? ''}`,
+      });
+    } catch (err) {
+      checks.push({ name: 'engine-runs-headless', ok: false, detail: String(err) });
+    } finally {
+      fs.rmSync(probeDir, { recursive: true, force: true });
+    }
+  }
+
+  const writable = (() => {
+    try {
+      const dir = path.join(process.cwd(), '.openscad-cli');
+      fs.mkdirSync(dir, { recursive: true });
+      const probe = path.join(dir, '.write-probe');
+      fs.writeFileSync(probe, 'ok');
+      fs.unlinkSync(probe);
+      return { ok: true, detail: dir };
+    } catch (err) {
+      return { ok: false, detail: `${process.cwd()} is not writable: ${String(err)}` };
+    }
+  })();
+  checks.push({ name: 'workdir-writable', ok: writable.ok, detail: writable.detail });
+
+  const mcad = enginePath ? guessMcadPath(enginePath) : undefined;
+  checks.push({
+    name: 'mcad-library',
+    ok: Boolean(mcad),
+    detail: mcad ?? 'not found; models using MCAD (gears, bearings) will fail to resolve',
+  });
+
+  const ok = checks.every((c) => c.ok);
+  if (args.outputFormat === 'json') {
+    process.stdout.write(
+      `${JSON.stringify(
+        {
+          schema: 'openscad-cli/doctor@1',
+          status: ok ? 'ok' : 'error',
+          engine: { path: enginePath || null, version: engineVersion },
+          checks,
+          search: engineSearchReport(),
+        },
+        null,
+        2,
+      )}\n`,
+    );
+  } else {
+    for (const c of checks) {
+      process.stdout.write(`${c.ok ? 'ok  ' : 'FAIL'}  ${c.name.padEnd(22)} ${c.detail}\n`);
+    }
+  }
+  return ok ? EXIT_CODES.OK : EXIT_CODES.ENGINE_UNAVAILABLE;
+}
+
+/** skill prints the agent skill bundle that ships with this CLI. */
+export async function cmdSkill(args: ParsedArgs): Promise<number> {
+  const bundle = loadSkillBundle();
+  if (args.outputFormat === 'text' || args.outputFormat === 'json') {
+    // Both formats print the raw markdown: the skill is a document, and an
+    // agent wants to read it, not parse it.
+    process.stdout.write(bundle);
+    return EXIT_CODES.OK;
+  }
+  return EXIT_CODES.OK;
+}
+
+function loadSkillBundle(): string {
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  const candidates = [
+    path.resolve(here, '..', 'skill'),
+    path.resolve(here, '..', '..', 'skill'),
+    path.resolve(process.cwd(), 'skill'),
+  ];
+  for (const dir of candidates) {
+    const file = path.join(dir, 'SKILL.md');
+    if (fileExists(file)) {
+      const parts: string[] = [fs.readFileSync(file, 'utf8')];
+      const refs = path.join(dir, 'references');
+      if (fs.existsSync(refs)) {
+        parts.push('\n---\n\n# Bundled references\n');
+        for (const name of fs.readdirSync(refs).sort()) {
+          if (!name.endsWith('.md')) continue;
+          parts.push(`\n<!-- ===== references/${name} ===== -->\n`);
+          parts.push(fs.readFileSync(path.join(refs, name), 'utf8'));
+        }
+      }
+      return parts.join('\n');
+    }
+  }
+  return '# Skill bundle unavailable\n\nNo skill/ directory was found next to this build.\n';
+}
+
+function readCliVersion(): string {
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  for (const candidate of [
+    path.resolve(here, '..', 'package.json'),
+    path.resolve(here, '..', '..', 'package.json'),
+  ]) {
+    try {
+      const parsed = JSON.parse(fs.readFileSync(candidate, 'utf8')) as { version?: string };
+      if (parsed.version) return parsed.version;
+    } catch {
+      /* try the next candidate */
+    }
+  }
+  return '0.0.0';
+}
+
+/** raw forwards argv to the engine untouched. */
+export async function cmdRaw(args: ParsedArgs): Promise<number> {
+  if (args.passthrough.length === 0) {
+    throw new CliError(
+      EXIT.USAGE,
+      'raw needs engine arguments after `--`, e.g. `openscad-cli raw -- --help`.',
+    );
+  }
+  const ctx = await makeContext(args);
+  const run = await invokeEngine({
+    enginePath: ctx.engine.path,
+    argv: args.passthrough,
+    cwd: process.cwd(),
+    timeoutMs: ctx.timeoutMs,
+  });
+  if (run.stdout) process.stdout.write(run.stdout);
+  if (run.stderr) process.stderr.write(run.stderr);
+  return run.exitCode ?? EXIT_CODES.INTERNAL;
+}

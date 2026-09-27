@@ -1,0 +1,60 @@
+{
+  "name": "openscad-cli",
+  "version": "0.1.0",
+  "description": "An agent-facing CLI that drives the OpenSCAD core engine to build, validate and export parametric 3D/2D models.",
+  "license": "GPL-2.0-or-later",
+  "type": "module",
+  "author": "the openscad-cli authors",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom2ueki/openscad-cli.git"
+  },
+  "homepage": "https://github.com/atom2ueki/openscad-cli#readme",
+  "bugs": {
+    "url": "https://github.com/atom2ueki/openscad-cli/issues"
+  },
+  "keywords": [
+    "openscad",
+    "cad",
+    "3d-printing",
+    "stl",
+    "3mf",
+    "parametric",
+    "agents",
+    "cli"
+  ],
+  "bin": {
+    "openscad-cli": "dist/cli.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "skill/**/*",
+    "LICENSE",
+    "NOTICE",
+    "THIRD_PARTY_LICENSES.md",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "pretest": "npm run build",
+    "test": "node --test test/*.test.js",
+    "test:unit": "node --test test/unit.*.test.js",
+    "test:integration": "node --test test/integration.*.test.js",
+    "lint:license": "node scripts/check-license-headers.mjs",
+    "compliance": "npm run lint:license && node scripts/check-compliance.mjs",
+    "prepack": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {}
+}

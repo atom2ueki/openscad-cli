@@ -1,0 +1,143 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2026 the openscad-cli authors
+name: release
+
+# Publishing is gated on the compliance job: no release is cut unless all nine
+# GPL-2.0 checks pass and the corresponding-source bundle is proven complete.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Build and verify every artifact without publishing'
+        type: boolean
+        default: true
+
+jobs:
+  verify:
+    uses: ./.github/workflows/compliance.yml
+
+  npm:
+    name: npm package
+    needs: verify
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - run: npm test
+
+      # The npm artifact is deliberately pure JavaScript. Bundling a ~100 MB
+      # dylib-tangled native engine in it is not viable on macOS; users get the
+      # engine from a package manager instead, and the CLI resolves it.
+      - name: verify the tarball ships no native code
+        run: |
+          set -euo pipefail
+          npm pack --silent > /tmp/tarname
+          TAR=$(cat /tmp/tarname)
+          echo "==> inspecting $TAR"
+          tar -tzf "$TAR" > /tmp/tarlist
+          if grep -Eiq '\.(node|dylib|so|a|wasm)$' /tmp/tarlist; then
+            echo "::error::the npm tarball contains native artifacts:"
+            grep -Ei '\.(node|dylib|so|a|wasm)$' /tmp/tarlist
+            exit 1
+          fi
+          for required in package/LICENSE package/NOTICE package/THIRD_PARTY_LICENSES.md \
+                         package/skill/SKILL.md; do
+            grep -q "^$required" /tmp/tarlist || { echo "::error::$required missing from the tarball"; exit 1; }
+          done
+          echo "tarball is pure JS and carries its licence files"
+
+      - name: smoke test the packed CLI
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/smoke && cd /tmp/smoke
+          tar -xzf "$OLDPWD/$(cat /tmp/tarname)"
+          cd package
+          node dist/cli.js --version
+          node dist/cli.js --help | head -20
+
+      - name: publish
+        if: ${{ !inputs.dry_run }}
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  source:
+    name: corresponding source
+    needs: verify
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: build the source bundle
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          packaging/make-source-tarball.sh "$VERSION" dist
+          ls -lh dist/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: source-tarball
+          path: dist/openscad-cli-*-src.tar.gz*
+
+  linux:
+    name: linux bundle (${{ matrix.arch }})
+    needs: verify
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        include:
+          - arch: x64
+          - arch: arm64
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: build an AppImage-style self-contained bundle
+        run: |
+          set -euo pipefail
+          VERSION=${GITHUB_REF_NAME#v}
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            cmake ninja-build pkg-config libboost-regex-dev libboost-program-options-dev \
+            libeigen3-dev libcgal-dev libgmp-dev libmpfr-dev libglib2.0-dev \
+            libfreetype-dev libzip-dev libxml2-dev libfontconfig-dev libharfbuzz-dev \
+            libdouble-conversion-dev libtbb-dev flex bison
+          packaging/build-engine.sh full
+          mkdir -p "openscad-cli-$VERSION-linux-${{ matrix.arch }}"
+          cp -R dist build packaging skill LICENSE NOTICE THIRD_PARTY_LICENSES.md README.md \
+            "openscad-cli-$VERSION-linux-${{ matrix.arch }}/" 2>/dev/null || true
+          tar -czf "openscad-cli-$VERSION-linux-${{ matrix.arch }}.tar.gz" \
+            "openscad-cli-$VERSION-linux-${{ matrix.arch }}"
+          sha256sum "openscad-cli-$VERSION-linux-${{ matrix.arch }}.tar.gz" > \
+            "openscad-cli-$VERSION-linux-${{ matrix.arch }}.tar.gz.sha256"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-${{ matrix.arch }}
+          path: openscad-cli-*-linux-*.tar.gz*
+
+  macos:
+    name: macos bundle (arm64)
+    needs: verify
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: build the headless engine for Apple Silicon
+        run: |
+          brew install cmake ninja pkg-config boost eigen cgal glib freetype \
+            libzip libxml2 fontconfig harfbuzz lib3mf double-conversion tbb catch2 ccache
+          packaging/build-engine.sh full
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-engine
+          path: build/engine/**/openscad*
