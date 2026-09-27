@@ -100,6 +100,28 @@ case "$(uname -s)" in
     ;;
 esac
 
+# Work around an upstream wiring bug in the pinned engine's CMakeLists.txt.
+# It links fontconfig and glib and harfbuzz, and adds the include directory for
+# glib and harfbuzz -- but never for fontconfig. On Linux that is invisible,
+# because /usr/include/fontconfig/fontconfig.h is the only one on the search
+# path. On macOS the runner has an older fontconfig header further along the
+# default search path, so the compiler picks that one, links against the
+# current 2.18.3 library, and then fails to compile FontCache.cc with "use of
+# undeclared identifier 'FC_FONT_FEATURES'".
+#
+# The submodule is pinned and must not be patched, so put the correct include
+# directory on the command line instead, where it precedes everything the
+# compiler would otherwise search. On Linux this expands to -I/usr/include and
+# changes nothing.
+FONTCONFIG_CFLAGS=""
+if command -v pkg-config >/dev/null 2>&1; then
+  FONTCONFIG_CFLAGS="$(pkg-config --cflags-only-I fontconfig 2>/dev/null || true)"
+fi
+if [ -n "$FONTCONFIG_CFLAGS" ]; then
+  COMMON_ARGS+=(-DCMAKE_CXX_FLAGS="$FONTCONFIG_CFLAGS")
+  echo "==> fontconfig include flags: $FONTCONFIG_CFLAGS"
+fi
+
 if [ "$PROFILE" = "lite" ]; then
   COMMON_ARGS+=(-DENABLE_CGAL=OFF -DENABLE_CAIRO=OFF)
 else
@@ -122,9 +144,19 @@ echo "==> building"
 JOBS="${JOBS:-$( (command -v nproc >/dev/null && nproc) || sysctl -n hw.ncpu || echo 4 )}"
 cmake --build "$REPO_ROOT/$BUILD_DIR" --parallel "$JOBS"
 
-BINARY="$(find "$REPO_ROOT/$BUILD_DIR" -maxdepth 3 -type f -name 'openscad*' -perm +111 2>/dev/null | head -1 || true)"
+# Locate the binary. Two portability notes:
+#   * `-perm +111` is BSD-only syntax; GNU find removed it in findutils
+#     4.5.12 (2013), where it is a hard error, not a warning. `-perm -u+x` is
+#     POSIX and means the same thing on both.
+#   * stderr is deliberately NOT discarded. It used to be, which turned that
+#     find error into a silent empty result and then reported "no engine
+#     binary produced" for a binary that had just linked successfully.
+BINARY="$(find "$REPO_ROOT/$BUILD_DIR" -maxdepth 3 -type f -name 'openscad*' -perm -u+x | head -1 || true)"
 if [ -z "$BINARY" ]; then
   echo "error: no engine binary produced" >&2
+  echo "hint:  searched $REPO_ROOT/$BUILD_DIR (maxdepth 3) for an executable named 'openscad*'" >&2
+  echo "hint:  the build above claimed success, so the binary is elsewhere or not executable" >&2
+  find "$REPO_ROOT/$BUILD_DIR" -maxdepth 3 -name 'openscad*' 2>/dev/null | sed 's/^/       found: /' >&2 || true
   exit 1
 fi
 

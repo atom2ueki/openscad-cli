@@ -127,8 +127,14 @@ jobs:
       - name: locate the built engine
         id: engine
         run: |
-          BIN=$(find build/engine -maxdepth 3 -type f -name 'openscad*' -perm +111 | head -1)
-          test -n "$BIN" || { echo "::error::no engine binary"; exit 1; }
+          # -perm -u+x, not -perm +111: the + form is BSD-only and GNU find
+          # removed it in findutils 4.5.12, where it is a hard error.
+          BIN=$(find build/engine -maxdepth 3 -type f -name 'openscad*' -perm -u+x | head -1)
+          test -n "$BIN" || {
+            echo "::error::no engine binary under build/engine"
+            find build/engine -maxdepth 3 -name 'openscad*' | sed 's/^/found: /' || true
+            exit 1
+          }
           echo "path=$PWD/$BIN" >> "$GITHUB_OUTPUT"
           "$BIN" --version
 
