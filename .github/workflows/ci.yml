@@ -75,6 +75,12 @@ jobs:
           cache: npm
       - run: npm ci
 
+      # libcairo2-dev is not optional here. The engine's FindCairo.cmake reads
+      # cairo-version.h to satisfy a `find_package(Cairo 1.14)`, and the runner
+      # image ships the cairo runtime without the headers. Without it the
+      # version resolves to the empty string and the configure step dies with
+      # "Required version (1.14) is higher than found version ()" — a message
+      # that reads like a version problem and is really a missing package.
       - name: install engine build dependencies (linux)
         if: runner.os == 'Linux'
         run: |
@@ -83,16 +89,26 @@ jobs:
             cmake ninja-build pkg-config \
             libboost-regex-dev libboost-program-options-dev \
             libeigen3-dev libcgal-dev libgmp-dev libmpfr-dev \
+            libcairo2-dev \
             libglib2.0-dev libfreetype-dev libzip-dev libxml2-dev \
             libfontconfig-dev libharfbuzz-dev libdouble-conversion-dev \
             libtbb-dev flex bison lib3mf-dev
 
+      # `cairo` for the same reason as libcairo2-dev above: it is what keeps
+      # PDF export compiled in (ENABLE_CAIRO gates export_pdf.cc).
+      #
+      # `lib3mf` was removed from homebrew-core, so it can no longer be
+      # installed from a formula. The engine's `full` profile only links it
+      # "when available" (see packaging/build-engine.sh), and 3MF is not
+      # required by any test, so macOS builds without it. A macOS engine
+      # therefore has no working 3MF import/export -- see build-engine.sh.
       - name: install engine build dependencies (macos)
         if: runner.os == 'macOS'
         run: |
           brew update
           brew install cmake ninja pkg-config boost eigen cgal glib freetype \
-            libzip libxml2 fontconfig harfbuzz lib3mf double-conversion tbb catch2 ccache
+            cairo libzip libxml2 fontconfig harfbuzz double-conversion tbb \
+            catch2 ccache
 
       - name: cache ccache
         uses: actions/cache@v4

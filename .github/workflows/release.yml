@@ -108,9 +108,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             cmake ninja-build pkg-config libboost-regex-dev libboost-program-options-dev \
-            libeigen3-dev libcgal-dev libgmp-dev libmpfr-dev libglib2.0-dev \
+            libeigen3-dev libcgal-dev libgmp-dev libmpfr-dev libcairo2-dev libglib2.0-dev \
             libfreetype-dev libzip-dev libxml2-dev libfontconfig-dev libharfbuzz-dev \
-            libdouble-conversion-dev libtbb-dev flex bison
+            libdouble-conversion-dev libtbb-dev flex bison lib3mf-dev
           packaging/build-engine.sh full
           mkdir -p "openscad-cli-$VERSION-linux-${{ matrix.arch }}"
           cp -R dist build packaging skill LICENSE NOTICE THIRD_PARTY_LICENSES.md README.md \
@@ -134,8 +134,11 @@ jobs:
           submodules: recursive
       - name: build the headless engine for Apple Silicon
         run: |
+          # lib3mf was removed from homebrew-core, so the macOS engine ships
+          # without 3MF support. `cairo` is required: it is what keeps PDF
+          # export compiled in. See packaging/build-engine.sh.
           brew install cmake ninja pkg-config boost eigen cgal glib freetype \
-            libzip libxml2 fontconfig harfbuzz lib3mf double-conversion tbb catch2 ccache
+            cairo libzip libxml2 fontconfig harfbuzz double-conversion tbb catch2 ccache
           packaging/build-engine.sh full
       - uses: actions/upload-artifact@v4
         with:
