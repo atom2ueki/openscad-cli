@@ -145,13 +145,17 @@ JOBS="${JOBS:-$( (command -v nproc >/dev/null && nproc) || sysctl -n hw.ncpu || 
 cmake --build "$REPO_ROOT/$BUILD_DIR" --parallel "$JOBS"
 
 # Locate the binary. Two portability notes:
-#   * `-perm +111` is BSD-only syntax; GNU find removed it in findutils
-#     4.5.12 (2013), where it is a hard error, not a warning. `-perm -u+x` is
-#     POSIX and means the same thing on both.
+#   * `-iname`, not `-name`: the engine sets OUTPUT_NAME to "OpenSCAD" on
+#     Apple and "openscad" elsewhere, so a case-sensitive match finds it on
+#     Linux and only accidentally on macOS, whose filesystem is
+#     case-insensitive by default but need not be.
+#   * `-perm -u+x`, not `+111`: the + form is BSD-only syntax and GNU find
+#     removed it in findutils 4.5.12 (2013), where it is a hard error, not a
+#     warning. `-u+x` is POSIX and means the same thing on both.
 #   * stderr is deliberately NOT discarded. It used to be, which turned that
 #     find error into a silent empty result and then reported "no engine
 #     binary produced" for a binary that had just linked successfully.
-BINARY="$(find "$REPO_ROOT/$BUILD_DIR" -maxdepth 3 -type f -name 'openscad*' -perm -u+x | head -1 || true)"
+BINARY="$(find "$REPO_ROOT/$BUILD_DIR" -maxdepth 3 -type f -iname 'openscad*' -perm -u+x | head -1 || true)"
 if [ -z "$BINARY" ]; then
   echo "error: no engine binary produced" >&2
   echo "hint:  searched $REPO_ROOT/$BUILD_DIR (maxdepth 3) for an executable named 'openscad*'" >&2
@@ -161,5 +165,46 @@ if [ -z "$BINARY" ]; then
 fi
 
 echo "==> built $BINARY"
+
+# Stage the resource tree where the engine will look for it.
+#
+# The engine resolves its resources relative to the executable
+# (PlatformUtils::lookupResourcesPath) and accepts a candidate directory only
+# if it contains a `color-schemes` subdirectory; `locale`, `examples`, `fonts`
+# and `libraries` are then read from that same root. The engine's own
+# install() rules put them under a resource dir, but this project deliberately
+# runs the binary in place out of the build tree, where none of them exist.
+#
+# Which root that is depends on the platform, because the two search lists
+# differ: Linux searches ".", "..", "../..", while Apple searches
+# "../Resources", "../../..", "../../../..", ".." and has no "." entry at all.
+# Staging beside the binary on macOS would therefore be invisible to it.
+#
+# The symptom is not a build failure. It is a build that succeeds and then
+# refuses to do any work: every render exits 1 with
+#   "Could not initialize localization (application path is '<build dir>')"
+# while `--version`, which needs no resources, keeps working perfectly, so the
+# binary looks healthy right up until it is actually used.
+BINDIR="$(dirname "$BINARY")"
+case "$(uname -s)" in
+  Darwin) RESOURCE_ROOT="$(dirname "$BINDIR")/Resources" ;;
+  *)      RESOURCE_ROOT="$BINDIR" ;;
+esac
+mkdir -p "$RESOURCE_ROOT"
+for resource in color-schemes examples fonts libraries locale shaders templates; do
+  if [ -d "$ENGINE_SRC/$resource" ]; then
+    cp -R "$ENGINE_SRC/$resource" "$RESOURCE_ROOT/" 2>/dev/null || true
+  fi
+done
+# The sentinel the lookup keys on: say so plainly if it is missing, because
+# without it every lookup fails for a reason that reads like a gettext problem.
+if [ ! -d "$RESOURCE_ROOT/color-schemes" ]; then
+  echo "error: $RESOURCE_ROOT/color-schemes is missing, so the engine cannot" >&2
+  echo "hint:  resources are resolved relative to the binary; see the note above" >&2
+  exit 1
+fi
+echo "==> staged resources in $RESOURCE_ROOT:" \
+     "$(cd "$RESOURCE_ROOT" && ls -d */ 2>/dev/null | tr -d '/' | tr '\n' ' ')"
+
 "$BINARY" --version || true
 echo "==> export OPENSCAD_ENGINE=\"$BINARY\" to use it"
