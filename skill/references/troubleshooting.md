@@ -59,6 +59,44 @@ arguments are allowed; mixing them with named ones is legal but error-prone.
 Expected when you intentionally compute in stages; use `let` or a new name.
 If you did not expect it, you have two assignments in one scope.
 
+## Valid mesh, wrong shape
+
+None of these produce a diagnostic, because the mesh really is valid. You find
+them by measuring.
+
+**The model is right but the size is not.** A `-D` value that did not apply, or
+applied as a string. Check `input.defines` in the result JSON, and re-check
+that the dimension actually reaching the geometry is the one you think.
+
+**Curves are all but flat, or angles are wrong.** Check the trig convention.
+This engine's `sin`/`cos`/`tan`/`asin`/`acos`/`atan` work in **degrees** while
+`PI` is still pi, so any `cos(radians(x))`-style code returns a value very close
+to 1 and every derived angle collapses. Confirm with
+`echo(cos(180), acos(0.5));` — `-1, 60` means degree-trig. A degree-trig mistake
+does not look like an error; it looks like a model that is slightly too small.
+See `references/language.md` for the wrapper pattern.
+
+**A volume that does not match the arithmetic.** Compute what the dimensions
+imply and compare. A wall that should be 2 mm and measures 0.4 mm is a dimension
+that collapsed, not a meshing problem.
+
+**A feature that measures differently at different heights.** A cylinder in the
+wrong place, a taper in the wrong direction, or cutters that were unioned
+despite sharing a surface. Section the mesh at several z heights and compare.
+Non-constant cross-section on a part that should be prismatic is the signature
+of a coincident-face boolean: the kernel resolved the ambiguity its own way and
+reported `status: "ok"`.
+
+**A hole that is chamfered on one end only, or not at all.** Check where the
+cone actually sits. A cone whose wide end is at the face and whose narrow end
+is at depth cuts material; reversed, it sits outside the part and cuts nothing
+while still exporting cleanly.
+
+**Nothing at all, exit 1, no diagnostic on a 2D export.** The engine does not
+project a 3D model for `--format dxf`. Add a `mode = "3d" | "2d"` switch and
+render flat geometry in 2D mode, ideally built from the same profile module the
+3D body extrudes so the two cannot disagree.
+
 ## The mesh is wrong
 
 **`geometry.nonmanifold` — not a valid closed solid.**
@@ -78,6 +116,20 @@ common instance: `cube([w, h, 0])` because a parameter was out of range.
 **`verify.sliver` — very thin triangles.**
 A boolean that only grazed a surface. Nudging the offset by 0.01 usually
 removes them. Harmless for printing, but they slow slicers.
+
+Two causes worth recognising, because they scale with the model's detail and so
+get worse the more carefully you draw something:
+
+- *Duplicate vertices.* A `polygon()` whose point list repeats a point leaves a
+  zero-length edge, and a zero-length edge triangulates into a sliver. It
+  happens easily when two generated point runs share an endpoint — generate the
+  tip land so it excludes both ends, or the first flank point.
+- *A profile chord grazing a disc.* Closing a tooth profile exactly on the root
+  circle leaves its closing chord skimming that surface. Start the profile well
+  inside the disc instead and let the union do the work.
+
+Raising the sampling density can make this worse rather than better: more points
+along a tightly curved region means more slivers, not fewer.
 
 **`geometry.triangulation` — part of the model did not triangulate.**
 Raise `$fn`, or round the offending edge slightly. Check for coincident or

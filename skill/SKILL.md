@@ -9,7 +9,7 @@ description: >-
   to iterate on a `.scad` model until it renders cleanly.
 license: GPL-2.0-or-later
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # openscad-cli
@@ -50,7 +50,11 @@ missing feature here.
 4. **Build.** `openscad-cli build model.scad -o part.stl`.
 5. **Read the result JSON.** Check `status`, `diagnostics`, and
    `stats.volume` / `stats.boundingBox`. A `warn` is still a successful build.
-6. **Iterate** by changing the model, not by hand-editing the mesh.
+6. **Check the numbers against the arithmetic.** `status: "ok"` means the mesh
+   is valid, not that it is the shape you meant. Compare `volume` to what the
+   dimensions imply, and section the mesh to measure anything curved. See
+   "Verify the shape" below.
+7. **Iterate** by changing the model, not by hand-editing the mesh.
 
 ## Commands
 
@@ -60,7 +64,7 @@ missing feature here.
 | Override dimensions | `openscad-cli build m.scad -D width=80 -D wall=3` |
 | Check without writing | `openscad-cli validate m.scad` |
 | Size variants | `openscad-cli variants m.scad --param width=40,60,80 --out-dir out/` |
-| 2D for laser cutting | `openscad-cli build m.scad -o plate.dxf --format dxf` |
+| 2D for laser cutting | `openscad-cli build m.scad -D 'mode="2d"' -o plate.dxf --format dxf` |
 | Format conversion | `openscad-cli convert m.scad -o part.3mf --format 3mf` |
 | See variables/messages | `openscad-cli inspect m.scad --echo` |
 | Engine capabilities | `openscad-cli info` |
@@ -68,6 +72,16 @@ missing feature here.
 
 Formats: `stl` (default, always binary) `off` `obj` `wrl` `3mf` for meshes;
 `dxf` `svg` `pdf` `pov` for 2D; `csg` `ast` `echo` `param` for inspection.
+
+**2D output needs a 2D model.** The engine will not project a 3D model for
+`--format dxf`; it exits 1 with no diagnostic at all. Give the model a mode
+switch and render flat geometry in 2D mode, sharing one profile module with
+the 3D path so the two cannot disagree:
+
+```openscad
+mode = "3d";   // [3d:2d]
+if (mode == "2d") flat(); else gear();
+```
 
 ## Reading the result
 
@@ -98,6 +112,60 @@ Exit codes: `0` success, `1` model error, `2` bad invocation, `3` engine
 missing, `4` validation failed under `--strict`, `5` timeout, `6` internal error.
 
 ## Rules that will save you
+
+**This engine's trig is in DEGREES, and `PI` is still pi.** `sin`, `cos`, `tan`,
+`asin`, `acos` and `atan` take and return degrees. Stock OpenSCAD is the other
+way round, so a model copied from the internet is silently wrong here, and the
+failure is invisible: a gear built with `cos(deg(20))` still exports a watertight
+mesh and still reports `status: "ok"` — it is just the wrong shape, because
+`cos(x)` quietly returns something very close to 1.
+
+Do the maths in radians and route every trig call through wrappers, so one flag
+switches conventions:
+
+```openscad
+TRIG_DEGREES = true;                // this engine; false for stock OpenSCAD
+
+function to_engine(a)   = TRIG_DEGREES ? a * 180 / PI : a;
+function from_engine(a) = TRIG_DEGREES ? a * PI / 180 : a;
+function sin_r(a)  = sin(to_engine(a));
+function cos_r(a)  = cos(to_engine(a));
+function tan_r(a)  = tan(to_engine(a));
+function acos_r(x) = from_engine(acos(x));
+```
+
+Angle-only formulae need more care than the wrappers give you: an involute
+curve's `tan(a) - a` is only correct as `tan_r(a) - a`, because subtracting
+degrees from a radian result is wrong even though each term looks right.
+
+Confirm the convention rather than trusting this note — it is one line, and it
+turns a silent wrong shape into a number you can read:
+
+```openscad
+echo(cos(180), acos(0.5));   // -1, 60 on this engine
+```
+
+**Never union cutters that share a radius.** A boolean whose faces are exactly
+coincident has no unambiguous answer, and the kernel's answer is still a valid
+mesh that reports `status: "ok"`. A chamfer cone narrowing to precisely the bore
+radius, unioned with the bore cylinder, gave a bore whose radius oscillated down
+the part — 5.0, 4.0, 6.0, 4.0 at successive heights. List the cutters as separate
+children of `difference()` and the same cone is exact to 0.02 mm.
+
+**Keep cutters overlapping the target, not just each other.** A cutter that only
+*touches* the target along a face has no overlap to cut, so the result is
+non-manifold. Extend cutters 1 mm past each face — the
+`translate([0,0,-1]) cube(...)` idiom. Point the other way, a cutter that sits
+entirely outside the part cuts nothing at all, leaving a parameter that looks
+live, exports cleanly, and does nothing.
+
+**Verify the shape, not just the status.** `status: "ok"` is a statement about
+mesh validity, not about whether the geometry is what you designed. Cheap
+checks that catch the whole class: compare `stats.volume` against what the
+dimensions imply; section the mesh at mid-height and measure a radius, a wall
+thickness or a tooth width at two or three heights; and for a real engineering
+curve, check it against the closed-form value. A wrong model is far more often
+a wrong *number* than a broken boolean, and the JSON will not tell you.
 
 **Variables are immutable within a scope.** Reassigning in the same scope
 produces a warning; the *first* assignment wins. Use `is_undef(x)`, never
