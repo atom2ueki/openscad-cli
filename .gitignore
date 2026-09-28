@@ -15,13 +15,10 @@
 # ---------------------------------------------------------------------------
 # `dist/` is emitted by `npm run build` and is reproducible from `src/`.
 dist/
+# `build/` stages both packaging jobs: the engine (build-engine.sh defaults to
+# build/engine) and the AppImage AppDir (build/appimage). Unanchored, so the
+# one line covers either of them.
 build/
-coverage/
-*.tsbuildinfo
-
-# The engine submodule is built in place; its output is not source.
-/engine/build/
-/engine/*.scad.out
 
 # ---------------------------------------------------------------------------
 # Node
@@ -29,15 +26,19 @@ coverage/
 # package-lock.json IS committed on purpose: without it `npm ci` is not
 # reproducible, and reproducibility is the point of this project.
 node_modules/
-npm-debug.log*
 *.log
 
 # ---------------------------------------------------------------------------
 # Engine submodule
 # ---------------------------------------------------------------------------
 # The gitlink under engine/ — the recorded commit SHA — is what pins the
-# engine, so /engine/ is deliberately NOT ignored. Only local build output
-# inside the submodule is excluded above.
+# engine, so /engine/ is deliberately NOT ignored. A rule written here cannot
+# reach inside it either: the submodule carries its own .gitignore, and git
+# rejects an engine/… pathspec from this file as "in submodule 'engine'".
+#
+# The patches themselves are source — make-source-tarball.sh ships the whole
+# packaging/patches/ tree as part of the corresponding source — so applied/ is
+# the one part of it left out.
 /packaging/patches/applied/
 
 # ---------------------------------------------------------------------------
@@ -68,12 +69,19 @@ npm-debug.log*
 !test/fixtures/assets/*.off
 !test/fixtures/assets/*.obj
 !test/fixtures/assets/*.svg
+!test/fixtures/assets/*.dxf
 !test/fixtures/assets/*.3mf
+
+# Scratch models. The README's worked example is one of these — its .scad is
+# deliberately kept out of the repo, so the directory scratch models get built
+# in is ignored whole, inputs as well as exports: `git add -A` then cannot pull
+# a part into a release by accident. A model worth keeping belongs in
+# test/fixtures/ with the test that covers it, or in assets/ as documentation.
+models/
 
 # ---------------------------------------------------------------------------
 # Release artifacts — these are published, not committed.
 # Compliance check 9 fails the release if a binary ever lands in git.
-/packaging/appimage/build/
 *.AppImage
 *.dmg
 *.tar.gz
