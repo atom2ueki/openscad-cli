@@ -157,6 +157,11 @@ printable parts, and troubleshooting keyed by diagnostic code. They are
 generated from inside the installed CLI, so the skill can never document a flag
 that a given build does not have.
 
+`packaging/install-skill.sh` copies the same bundle, straight from `skill/`, into
+each agent runtime on the machine that reads skills from a data directory — Mavis
+(`~/.minimax/skills/`) and omp (`~/.agents/skills/`). Pass a directory to install
+somewhere else instead.
+
 The short version of the loop:
 
 ```bash
