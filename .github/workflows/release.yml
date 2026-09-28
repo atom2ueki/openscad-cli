@@ -132,14 +132,24 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: build the headless engine for Apple Silicon
+      - name: install engine build dependencies (macos)
+        timeout-minutes: 20
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: '1'
+          HOMEBREW_NO_INSTALL_CLEANUP: '1'
         run: |
           # lib3mf was removed from homebrew-core, so the macOS engine ships
           # without 3MF support. `cairo` is required: it is what keeps PDF
           # export compiled in. See packaging/build-engine.sh.
+          #
+          # No `brew update`, and bounded on purpose: the implicit auto-update
+          # inside `brew install` has hung and consumed whole job budgets in
+          # CI, reporting only as "cancelled". Kept as its own step so the
+          # bound cannot clip the engine build below.
           brew install cmake ninja pkg-config boost eigen cgal glib freetype \
             cairo libzip libxml2 fontconfig harfbuzz double-conversion tbb catch2 ccache
-          packaging/build-engine.sh full
+      - name: build the headless engine for Apple Silicon
+        run: packaging/build-engine.sh full
       - uses: actions/upload-artifact@v4
         with:
           name: macos-engine

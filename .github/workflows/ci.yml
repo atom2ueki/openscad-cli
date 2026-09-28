@@ -106,10 +106,24 @@ jobs:
       # "when available" (see packaging/build-engine.sh), and 3MF is not
       # required by any test, so macOS builds without it. A macOS engine
       # therefore has no working 3MF import/export -- see build-engine.sh.
+      #
+      # No `brew update`, and the step is bounded. `brew install` runs an
+      # implicit auto-update against Homebrew's metadata endpoints unless
+      # HOMEBREW_NO_AUTO_UPDATE is set, and that network fetch has hung twice
+      # on this repository -- once on main and once on PR #1. A hang there
+      # burns the job's entire 120-minute budget and is reported as
+      # "cancelled", which says nothing about the cause and never reaches a
+      # compile step. Runner images ship a current enough Homebrew and
+      # `brew install` fetches bottles directly, so the update buys nothing
+      # worth a two-hour failure mode. HOMEBREW_NO_INSTALL_CLEANUP avoids the
+      # same class of unbounded work in the cleanup pass.
       - name: install engine build dependencies (macos)
         if: runner.os == 'macOS'
+        timeout-minutes: 20
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: '1'
+          HOMEBREW_NO_INSTALL_CLEANUP: '1'
         run: |
-          brew update
           brew install cmake ninja pkg-config boost eigen cgal glib freetype \
             cairo libzip libxml2 fontconfig harfbuzz double-conversion tbb \
             catch2 ccache
