@@ -20,8 +20,13 @@ $ openscad-cli build bracket.scad -o bracket.stl --json
 
 ## A real export
 
-A 20-tooth involute spur gear, module 2, 8 mm face, 8 mm bore with a 0.8 mm
-lead-in chamfer:
+The brief, put the way you would put it to an agent that has the skill loaded:
+
+> A 20-tooth involute spur gear, module 2, 8 mm face, 8 mm bore with a 0.8 mm
+> lead-in chamfer at both ends. It has to print without support, and the teeth
+> have to mesh with an identical gear.
+
+The result — that `gear.stl`, opened in a third-party viewer:
 
 <a href="assets/gear-example.png"><img src="assets/gear-example.png" width="480" alt="A 20-tooth involute spur gear with a chamfered central bore, viewed from above and slightly to the side"></a>
 
@@ -39,10 +44,18 @@ $ openscad-cli build gear.scad -o gear.stl
 }
 ```
 
-`"status": "ok"` with an empty `diagnostics` array is the whole contract: no log
-scraping, no guessing whether the part will print. Here that means a watertight
-mesh, 9279.104 mm³ against a 44 × 44 × 8 envelope, and no degenerate or sliver
-triangles — three numbers a slicer would otherwise be the first to discover.
+Note what is *not* in that output: no `WARNING`, no `Geometries may not be
+generated`, nothing an agent has to interpret. `"status": "ok"` with an empty
+`diagnostics` array is the whole contract — no log scraping, no guessing
+whether the part will print. Here it means a watertight mesh, 9279.104 mm³
+against a 44 × 44 × 8 envelope, and no degenerate or sliver triangles, which
+are three numbers a slicer would otherwise be the first to discover.
+
+The teeth are a true involute, not a trapezoid approximation: the flanks track
+the analytic curve to within **0.1 µm on average** and 3.2 µm at worst, and
+the tooth measures 2.9915 mm at the pitch circle against a theoretical
+2.9916 mm. That is the difference between a gear that meshes and a decorative
+one, and it is not something `status: "ok"` will tell you.
 
 The engine drew nothing. It cannot — see below. The image is that `gear.stl`
 opened in a third-party viewer; the geometry is entirely the CLI's and the
