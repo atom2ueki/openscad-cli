@@ -2,13 +2,20 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2026 the openscad-cli authors
 #
-# Install (or refresh) the agent skill for Mavis and any other agent runtime
+# Install (or refresh) the agent skill for every agent runtime on this machine
 # that reads skills from a data directory.
 #
-#   packaging/install-skill.sh [target-skills-dir]
+#   packaging/install-skill.sh [skills-dir ...]
 #
-# The repo's skill/ directory is the source of truth. This copies it into
-# <target>/openscad-cli/ so a running agent can load it with the skill tool.
+# The repo's skill/ directory is the source of truth. With no arguments this
+# copies it into <data-dir>/skills/openscad-cli for each runtime that is
+# present:
+#
+#   ~/.minimax   Mavis                   ($OPENSCAD_CLI_DATA_DIR overrides)
+#   ~/.agents    omp, and anything else on the .agent[s]/skills layout
+#   ~/.agent     the same layout under its older singular spelling
+#
+# Pass one or more directories to install into those instead of detecting.
 # Re-run it after editing skill/ — the CLI's own `openscad-cli skill` command
 # prints the same bundle, so the three can always be compared.
 #
@@ -20,37 +27,76 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SOURCE="$REPO_ROOT/skill"
-DATA_DIR="${OPENSCAD_CLI_DATA_DIR:-$HOME/.minimax}"
-TARGET_ROOT="${1:-$DATA_DIR/skills}"
-TARGET="$TARGET_ROOT/openscad-cli"
 
 if [ ! -f "$SOURCE/SKILL.md" ]; then
   echo "error: $SOURCE/SKILL.md not found" >&2
   exit 1
 fi
 
-echo "==> installing $SOURCE -> $TARGET"
-mkdir -p "$TARGET/references"
+# install_into <skills-dir> <label>
+install_into() {
+  local skills_dir="$1" label="$2"
+  local target="$skills_dir/openscad-cli"
 
-# Replace the payload atomically-ish: clear references first so a deleted
-# reference file does not linger and get read as if it still existed.
-cp "$SOURCE/SKILL.md" "$TARGET/SKILL.md"
-for f in "$SOURCE"/references/*.md; do
-  [ -e "$f" ] || continue
-  cp "$f" "$TARGET/references/$(basename "$f")"
-done
-# Drop references that no longer exist upstream.
-for stale in "$TARGET"/references/*.md; do
-  [ -e "$stale" ] || continue
-  base=$(basename "$stale")
-  [ -f "$SOURCE/references/$base" ] || { echo "    removing stale reference $base"; rm -f "$stale"; }
+  echo "==> installing $SOURCE -> $target ($label)"
+  mkdir -p "$target/references"
+
+  cp "$SOURCE/SKILL.md" "$target/SKILL.md"
+  for f in "$SOURCE"/references/*.md; do
+    [ -e "$f" ] || continue
+    cp "$f" "$target/references/$(basename "$f")"
+  done
+  # Drop references that no longer exist upstream.
+  for stale in "$target"/references/*.md; do
+    [ -e "$stale" ] || continue
+    base=$(basename "$stale")
+    [ -f "$SOURCE/references/$base" ] || { echo "    removing stale reference $base"; rm -f "$stale"; }
+  done
+
+  find "$target" -type f | sed "s|$target/|    |" | sort
+}
+
+# Runtime data directories, in install order, with parallel labels.
+runtime_dirs=()
+runtime_labels=()
+
+if [ "$#" -gt 0 ]; then
+  for dir in "$@"; do
+    runtime_dirs+=("$dir")
+    runtime_labels+=("explicit")
+  done
+else
+  mavis_data_dir="${OPENSCAD_CLI_DATA_DIR:-$HOME/.minimax}"
+  if [ -d "$mavis_data_dir" ]; then
+    runtime_dirs+=("$mavis_data_dir/skills")
+    runtime_labels+=("Mavis")
+  fi
+  # omp discovers .agent[s]/skills. The two spellings are one layout, so install
+  # into a single one of them: both would surface as a duplicate skill name.
+  if [ -d "$HOME/.agents" ]; then
+    runtime_dirs+=("$HOME/.agents/skills")
+    runtime_labels+=("omp")
+  elif [ -d "$HOME/.agent" ]; then
+    runtime_dirs+=("$HOME/.agent/skills")
+    runtime_labels+=("omp")
+  fi
+fi
+
+if [ "${#runtime_dirs[@]}" -eq 0 ]; then
+  echo "error: no agent runtime found — looked for \${OPENSCAD_CLI_DATA_DIR}, ~/.minimax, ~/.agents, ~/.agent" >&2
+  echo "usage: packaging/install-skill.sh [skills-dir ...]" >&2
+  exit 1
+fi
+
+for i in "${!runtime_dirs[@]}"; do
+  install_into "${runtime_dirs[$i]}" "${runtime_labels[$i]}"
 done
 
-echo "==> installed:"
-ls -1 "$TARGET" "$TARGET/references" | sed 's/^/    /'
 echo
-echo "The skill takes effect in the next session (no runtime restart needed)."
-echo "Verify with:  skill({ name: \"openscad-cli\" })"
+echo "Installed into ${#runtime_dirs[@]} runtime(s). The skill takes effect in the"
+echo "next session (no runtime restart needed). Verify with:"
+echo "  omp read skill://openscad-cli        (omp, from a shell)"
+echo '  skill({ name: "openscad-cli" })      (Mavis, inside a session)'
 echo
 echo "Make sure the CLI itself is reachable:"
 echo "  ~/.local/bin/openscad-cli doctor"
