@@ -39,21 +39,18 @@ install_into() {
   local target="$skills_dir/openscad-cli"
 
   echo "==> installing $SOURCE -> $target ($label)"
-  mkdir -p "$target/references"
+  mkdir -p "$skills_dir"
 
-  cp "$SOURCE/SKILL.md" "$target/SKILL.md"
-  for f in "$SOURCE"/references/*.md; do
-    [ -e "$f" ] || continue
-    cp "$f" "$target/references/$(basename "$f")"
-  done
-  # Drop references that no longer exist upstream.
-  for stale in "$target"/references/*.md; do
-    [ -e "$stale" ] || continue
-    base=$(basename "$stale")
-    [ -f "$SOURCE/references/$base" ] || { echo "    removing stale reference $base"; rm -f "$stale"; }
-  done
+  # The target is entirely ours, so rebuild it rather than reconcile it: a
+  # page deleted or renamed upstream must not linger, and a directory tree
+  # (references/, kb/) must arrive whole. The old flat copy of references/*.md
+  # silently skipped every subdirectory.
+  rm -rf "$target"
+  mkdir -p "$target"
+  cp -R "$SOURCE"/. "$target"/
 
   find "$target" -type f | sed "s|$target/|    |" | sort
+  echo "    ($(find "$target" -type f | wc -l | tr -d ' ') files)"
 }
 
 # Runtime data directories, in install order, with parallel labels.
