@@ -348,19 +348,36 @@ function loadSkillBundle(): string {
     const file = path.join(dir, 'SKILL.md');
     if (fileExists(file)) {
       const parts: string[] = [fs.readFileSync(file, 'utf8')];
-      const refs = path.join(dir, 'references');
-      if (fs.existsSync(refs)) {
+      // Everything under skill/ ships in the bundle: references/ first, then
+      // the knowledge base. A subdirectory used to be invisible here, so a page
+      // added under kb/ would have been installed but never printed.
+      const pages = collectMarkdown(dir);
+      const ordered = [
+        ...pages.filter((p) => p.startsWith('references/')),
+        ...pages.filter((p) => !p.startsWith('references/')),
+      ];
+      if (ordered.length > 0) {
         parts.push('\n---\n\n# Bundled references\n');
-        for (const name of fs.readdirSync(refs).sort()) {
-          if (!name.endsWith('.md')) continue;
-          parts.push(`\n<!-- ===== references/${name} ===== -->\n`);
-          parts.push(fs.readFileSync(path.join(refs, name), 'utf8'));
+        for (const rel of ordered) {
+          parts.push(`\n<!-- ===== ${rel} ===== -->\n`);
+          parts.push(fs.readFileSync(path.join(dir, ...rel.split('/')), 'utf8'));
         }
       }
       return parts.join('\n');
     }
   }
   return '# Skill bundle unavailable\n\nNo skill/ directory was found next to this build.\n';
+}
+
+/** Markdown files under `dir`, relative to it, excluding SKILL.md itself. */
+function collectMarkdown(dir: string, prefix = ''): string[] {
+  const out: string[] = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
+    if (entry.isDirectory()) out.push(...collectMarkdown(path.join(dir, entry.name), rel));
+    else if (entry.name.endsWith('.md') && entry.name !== 'SKILL.md') out.push(rel);
+  }
+  return out.sort();
 }
 
 function readCliVersion(): string {
