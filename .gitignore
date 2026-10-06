@@ -10,6 +10,12 @@
 # can build the pinned engine.
 .tools/
 
+# The upstream model corpus that skill/kb/ distils. Fetched by
+# scripts/kb/fetch-upstream.sh, git-ignored because it is 140 MB of binary
+# assets that compliance check 9 forbids. Only the generated catalog and the
+# hand-written pages under skill/kb/ are committed.
+.kb-src/
+
 # ---------------------------------------------------------------------------
 # Build output
 # ---------------------------------------------------------------------------

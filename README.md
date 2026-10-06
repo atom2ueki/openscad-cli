@@ -153,14 +153,42 @@ openscad-cli skill > openscad.md
 ```
 
 `SKILL.md` plus four references — language, commands, design rules for
-printable parts, and troubleshooting keyed by diagnostic code. They are
-generated from inside the installed CLI, so the skill can never document a flag
-that a given build does not have.
+printable parts, and troubleshooting keyed by diagnostic code — and the design
+knowledge base under `kb/`. They are generated from inside the installed CLI, so
+the skill can never document a flag that a given build does not have.
 
 `packaging/install-skill.sh` copies the same bundle, straight from `skill/`, into
 each agent runtime on the machine that reads skills from a data directory — Mavis
 (`~/.minimax/skills/`) and omp (`~/.agents/skills/`). Pass a directory to install
 somewhere else instead.
+
+### The knowledge base
+
+`skill/kb/` is the part of the skill that is about *design* rather than about
+this CLI: a distilled corpus of proven parametric parts — threaded containers,
+flat-pack springs, joins, print-in-place mechanisms, surface textures, hull
+constructions, BOSL2 idioms — with the exact numbers and the failure modes their
+authors documented in comments.
+
+An agent starts at `kb/INDEX.md`, which routes by what you are building, states
+the two rules that decide most print failures (keep every force path in-plane
+with the layer lines; never let two CSG faces be exactly coincident), and lists
+the non-negotiable numbers (1 mm minimum wall, 0.2 mm layer, 0.3 mm compliant
+clearance, 0.05 mm anti-coplanar pad).
+
+The technique pages are hand-written. `kb/catalog.md` and `kb/catalog.json` are
+generated from the upstream corpus and list every `module` and `function` in its
+libraries with parameters:
+
+```bash
+scripts/kb/fetch-upstream.sh    # clone the pinned corpus into .kb-src/ (git-ignored)
+node scripts/kb/generate.mjs    # regenerate skill/kb/catalog.{md,json}
+```
+
+The corpus ([`jhermann/things`](https://github.com/jhermann/things), Apache-2.0)
+is fetched on demand, never vendored: it is 140 MB of models and binary assets,
+and no upstream file or binary is redistributed here. See
+`THIRD_PARTY_LICENSES.md`.
 
 The short version of the loop:
 

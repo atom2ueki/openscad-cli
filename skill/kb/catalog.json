@@ -1,0 +1,4274 @@
+{
+  "schema": "openscad-cli/kb-catalog@1",
+  "upstream": {
+    "repo": "https://github.com/jhermann/things",
+    "commit": "2ffef57550099362c5ef9659150969139f7c8a45",
+    "date": "2026-10-05",
+    "license": "Apache-2.0",
+    "note": "Source of the techniques the prose pages under skill/kb/ distil."
+  },
+  "topics": [
+    {
+      "id": "threads",
+      "title": "Threaded containers",
+      "page": "threads.md",
+      "files": [
+        "bosl2/threads.scad",
+        "parts/threads.scad"
+      ]
+    },
+    {
+      "id": "springs",
+      "title": "Springs and flexures",
+      "page": "springs.md",
+      "files": [
+        "parts/springs/coil-spring.scad",
+        "parts/springs/extension-spring.scad",
+        "parts/springs/leaf-spring.scad",
+        "parts/springs/omega-spring.scad",
+        "parts/springs/snap-fit.scad",
+        "parts/springs/stabilizer-spring.scad"
+      ]
+    },
+    {
+      "id": "joining",
+      "title": "Joining printed pieces",
+      "page": "joining.md",
+      "files": [
+        "parts/joining/dovetail.scad",
+        "parts/joining/grip-fins.scad",
+        "parts/joining/heat-insert.scad",
+        "parts/joining/square-dowel.scad",
+        "parts/joining/vertical-sturdy-plug.scad"
+      ]
+    },
+    {
+      "id": "mechanisms",
+      "title": "Print-in-place mechanisms",
+      "page": "mechanisms.md",
+      "files": [
+        "parts/mechanisms/hinge.scad",
+        "parts/mechanisms/over-center-latch.scad"
+      ]
+    },
+    {
+      "id": "textures",
+      "title": "Surface textures",
+      "page": "textures.md",
+      "files": [
+        "parts/textures/diamond-tread.scad",
+        "parts/textures/diamonds.scad",
+        "parts/textures/japandi.scad",
+        "parts/textures/knurling.scad",
+        "parts/textures/ribbing.scad",
+        "parts/textures/stippling.scad",
+        "parts/textures/waves.scad"
+      ]
+    },
+    {
+      "id": "solids",
+      "title": "Reusable solids",
+      "page": "solids.md",
+      "files": [
+        "parts/disks-and-washers.scad",
+        "parts/hull.scad",
+        "parts/ibeam.scad",
+        "parts/rounded-cubes.scad",
+        "parts/shells.scad",
+        "parts/support-fin.scad",
+        "parts/torus.scad"
+      ]
+    },
+    {
+      "id": "bosl2",
+      "title": "BOSL2 idioms",
+      "page": "bosl2.md",
+      "files": [
+        "bosl2/attach2.scad",
+        "bosl2/bridged-hole.scad",
+        "bosl2/holes-grid.scad",
+        "bosl2/name-plate.scad",
+        "bosl2/screw-post.scad"
+      ]
+    },
+    {
+      "id": "models",
+      "title": "Worked models",
+      "page": "models.md",
+      "files": [
+        "models/ac-bayonet-connectors/hose-connector-multi-plate.scad",
+        "models/ac-drain-pan/ac-drain-pan.scad",
+        "models/ac-hose-connector-intake/hose-connector-intake.scad",
+        "models/ac-hose-connector-intake/vent-cover-grill.scad",
+        "models/ac-intake-cover-side-extension/Side-Extension-Box.scad",
+        "models/bambu-lab-a1/gantry-mount.scad",
+        "models/camera-tapo-230/wall-mount.scad",
+        "models/clothes-pin/pin.scad",
+        "models/eye-drops/eye-drops.scad",
+        "models/hinged-box/box.scad",
+        "models/lamp-led-puck/lampbase.scad",
+        "models/lamp-led-puck/shade-base-connector.scad",
+        "models/lamp-led-puck/shades/lampshade.scad",
+        "models/lamp-led-puck/shades/round-image.scad",
+        "models/lamp-led-puck/shades/round-textured.scad",
+        "models/lamp-led-puck/shades/wide-round-textured.scad"
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "topic": "threads",
+      "file": "bosl2/threads.scad",
+      "kind": "module",
+      "name": "std_thread",
+      "signature": "module std_thread(l, internal=false, bevel1=false, bevel2=false, anchor=BOTTOM)",
+      "params": [
+        {
+          "name": "l",
+          "default": ""
+        },
+        {
+          "name": "internal",
+          "default": "false"
+        },
+        {
+          "name": "bevel1",
+          "default": "false"
+        },
+        {
+          "name": "bevel2",
+          "default": "false"
+        },
+        {
+          "name": "anchor",
+          "default": "BOTTOM"
+        }
+      ],
+      "doc": "Same nominal thread on both parts; internal=true auto-enlarges via $slop."
+    },
+    {
+      "topic": "threads",
+      "file": "bosl2/threads.scad",
+      "kind": "module",
+      "name": "threaded_container",
+      "signature": "module threaded_container()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "threads",
+      "file": "bosl2/threads.scad",
+      "kind": "module",
+      "name": "threaded_lid",
+      "signature": "module threaded_lid()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "threads",
+      "file": "parts/threads.scad",
+      "kind": "function",
+      "name": "thread_profile",
+      "signature": "function thread_profile(thread_height, thread_z)",
+      "params": [
+        {
+          "name": "thread_height",
+          "default": ""
+        },
+        {
+          "name": "thread_z",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "threads",
+      "file": "parts/threads.scad",
+      "kind": "module",
+      "name": "thread_slice",
+      "signature": "module thread_slice(theta, z_center, radius, thread_height, thread_z)",
+      "params": [
+        {
+          "name": "theta",
+          "default": ""
+        },
+        {
+          "name": "z_center",
+          "default": ""
+        },
+        {
+          "name": "radius",
+          "default": ""
+        },
+        {
+          "name": "thread_height",
+          "default": ""
+        },
+        {
+          "name": "thread_z",
+          "default": ""
+        }
+      ],
+      "doc": "Places the profile (radial, axial) as a thin slab in the XZ half-plane at the given angle/height around the Z axis."
+    },
+    {
+      "topic": "threads",
+      "file": "parts/threads.scad",
+      "kind": "module",
+      "name": "helical_thread",
+      "signature": "module helical_thread(radius, height, pitch, thread_height, thread_z)",
+      "params": [
+        {
+          "name": "radius",
+          "default": ""
+        },
+        {
+          "name": "height",
+          "default": ""
+        },
+        {
+          "name": "pitch",
+          "default": ""
+        },
+        {
+          "name": "thread_height",
+          "default": ""
+        },
+        {
+          "name": "thread_z",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "threads",
+      "file": "parts/threads.scad",
+      "kind": "module",
+      "name": "external_thread",
+      "signature": "module external_thread(radius, height, pitch, thread_height, thread_z)",
+      "params": [
+        {
+          "name": "radius",
+          "default": ""
+        },
+        {
+          "name": "height",
+          "default": ""
+        },
+        {
+          "name": "pitch",
+          "default": ""
+        },
+        {
+          "name": "thread_height",
+          "default": ""
+        },
+        {
+          "name": "thread_z",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "threads",
+      "file": "parts/threads.scad",
+      "kind": "module",
+      "name": "internal_thread",
+      "signature": "module internal_thread(radius, height, pitch, thread_height, thread_z)",
+      "params": [
+        {
+          "name": "radius",
+          "default": ""
+        },
+        {
+          "name": "height",
+          "default": ""
+        },
+        {
+          "name": "pitch",
+          "default": ""
+        },
+        {
+          "name": "thread_height",
+          "default": ""
+        },
+        {
+          "name": "thread_z",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "threads",
+      "file": "parts/threads.scad",
+      "kind": "module",
+      "name": "lid_rib",
+      "signature": "module lid_rib(radius, height)",
+      "params": [
+        {
+          "name": "radius",
+          "default": ""
+        },
+        {
+          "name": "height",
+          "default": ""
+        }
+      ],
+      "doc": "Ribs stop short of the top/bottom chamfers so they don't poke through the sloped edges, and stop a further rib thickness short of that so their flat ends stay tucked inside the rounded rings instead of poking past them."
+    },
+    {
+      "topic": "threads",
+      "file": "parts/threads.scad",
+      "kind": "module",
+      "name": "lid_ribbing",
+      "signature": "module lid_ribbing(radius, height)",
+      "params": [
+        {
+          "name": "radius",
+          "default": ""
+        },
+        {
+          "name": "height",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "threads",
+      "file": "parts/threads.scad",
+      "kind": "module",
+      "name": "lid_rib_ring",
+      "signature": "module lid_rib_ring(radius, z_center)",
+      "params": [
+        {
+          "name": "radius",
+          "default": ""
+        },
+        {
+          "name": "z_center",
+          "default": ""
+        }
+      ],
+      "doc": "Encircling band matching the rib's radial and vertical thickness, flush with the top/bottom of the ribbed section."
+    },
+    {
+      "topic": "threads",
+      "file": "parts/threads.scad",
+      "kind": "module",
+      "name": "lid_rib_rings",
+      "signature": "module lid_rib_rings(radius, height)",
+      "params": [
+        {
+          "name": "radius",
+          "default": ""
+        },
+        {
+          "name": "height",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "threads",
+      "file": "parts/threads.scad",
+      "kind": "module",
+      "name": "chamfer_cut",
+      "signature": "module chamfer_cut(radius, z, size, flip=false)",
+      "params": [
+        {
+          "name": "radius",
+          "default": ""
+        },
+        {
+          "name": "z",
+          "default": ""
+        },
+        {
+          "name": "size",
+          "default": ""
+        },
+        {
+          "name": "flip",
+          "default": "false"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "threads",
+      "file": "parts/threads.scad",
+      "kind": "module",
+      "name": "threaded_container",
+      "signature": "module threaded_container()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "threads",
+      "file": "parts/threads.scad",
+      "kind": "module",
+      "name": "threaded_lid",
+      "signature": "module threaded_lid()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/coil-spring.scad",
+      "kind": "module",
+      "name": "see_through",
+      "signature": "module see_through(base_color=\"grey\", alpha=0.6)",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"grey\""
+        },
+        {
+          "name": "alpha",
+          "default": "0.6"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/coil-spring.scad",
+      "kind": "module",
+      "name": "solid",
+      "signature": "module solid(base_color=\"red\")",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"red\""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/coil-spring.scad",
+      "kind": "function",
+      "name": "spiral_path",
+      "signature": "function spiral_path()",
+      "params": [],
+      "doc": "Archimedean spiral centerline, starting in the wall of the inner ring"
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/coil-spring.scad",
+      "kind": "function",
+      "name": "outer_ring_center",
+      "signature": "function outer_ring_center()",
+      "params": [],
+      "doc": "Centre of the outer ring, continuing along the band's end tangent"
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/coil-spring.scad",
+      "kind": "module",
+      "name": "spiral_band",
+      "signature": "module spiral_band()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/coil-spring.scad",
+      "kind": "module",
+      "name": "mounting_ring",
+      "signature": "module mounting_ring()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/coil-spring.scad",
+      "kind": "module",
+      "name": "assembly",
+      "signature": "module assembly()",
+      "params": [],
+      "doc": "==================================================================== Main Assembly & Plates ===================================================================="
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/coil-spring.scad",
+      "kind": "module",
+      "name": "mw_plate_1",
+      "signature": "module mw_plate_1()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/extension-spring.scad",
+      "kind": "module",
+      "name": "see_through",
+      "signature": "module see_through(base_color=\"grey\", alpha=0.6)",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"grey\""
+        },
+        {
+          "name": "alpha",
+          "default": "0.6"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/extension-spring.scad",
+      "kind": "module",
+      "name": "solid",
+      "signature": "module solid(base_color=\"red\")",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"red\""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/extension-spring.scad",
+      "kind": "function",
+      "name": "wave_corners",
+      "signature": "function wave_corners()",
+      "params": [],
+      "doc": "Trapezoid wave corners: the flat projection of a helix with flat crests"
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/extension-spring.scad",
+      "kind": "function",
+      "name": "wave_path",
+      "signature": "function wave_path()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/extension-spring.scad",
+      "kind": "module",
+      "name": "wave_band",
+      "signature": "module wave_band()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/extension-spring.scad",
+      "kind": "module",
+      "name": "assembly",
+      "signature": "module assembly()",
+      "params": [],
+      "doc": "==================================================================== Main Assembly & Plates ===================================================================="
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/extension-spring.scad",
+      "kind": "module",
+      "name": "mw_plate_1",
+      "signature": "module mw_plate_1()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/leaf-spring.scad",
+      "kind": "module",
+      "name": "see_through",
+      "signature": "module see_through(base_color=\"grey\", alpha=0.6)",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"grey\""
+        },
+        {
+          "name": "alpha",
+          "default": "0.6"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/leaf-spring.scad",
+      "kind": "module",
+      "name": "solid",
+      "signature": "module solid(base_color=\"red\")",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"red\""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/leaf-spring.scad",
+      "kind": "function",
+      "name": "ring_attach_x",
+      "signature": "function ring_attach_x(y)",
+      "params": [
+        {
+          "name": "y",
+          "default": ""
+        }
+      ],
+      "doc": "X distance from a ring's center to where a band at height y meets its mid-radius"
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/leaf-spring.scad",
+      "kind": "function",
+      "name": "band_region",
+      "signature": "function band_region(y)",
+      "params": [
+        {
+          "name": "y",
+          "default": ""
+        }
+      ],
+      "doc": "A single band at height y between the rings, bulging towards +Y"
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/leaf-spring.scad",
+      "kind": "function",
+      "name": "ring_region",
+      "signature": "function ring_region(x)",
+      "params": [
+        {
+          "name": "x",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/leaf-spring.scad",
+      "kind": "function",
+      "name": "leaf_pair_regions",
+      "signature": "function leaf_pair_regions()",
+      "params": [],
+      "doc": "Two parallel leaves bowing towards +Y"
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/leaf-spring.scad",
+      "kind": "function",
+      "name": "leaf_spring_region",
+      "signature": "function leaf_spring_region()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/leaf-spring.scad",
+      "kind": "module",
+      "name": "leaf_spring",
+      "signature": "module leaf_spring()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/leaf-spring.scad",
+      "kind": "module",
+      "name": "assembly",
+      "signature": "module assembly()",
+      "params": [],
+      "doc": "==================================================================== Main Assembly & Plates ===================================================================="
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/leaf-spring.scad",
+      "kind": "module",
+      "name": "mw_plate_1",
+      "signature": "module mw_plate_1()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/omega-spring.scad",
+      "kind": "module",
+      "name": "see_through",
+      "signature": "module see_through(base_color=\"grey\", alpha=0.6)",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"grey\""
+        },
+        {
+          "name": "alpha",
+          "default": "0.6"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/omega-spring.scad",
+      "kind": "module",
+      "name": "solid",
+      "signature": "module solid(base_color=\"red\")",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"red\""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/omega-spring.scad",
+      "kind": "function",
+      "name": "leg_path",
+      "signature": "function leg_path()",
+      "params": [],
+      "doc": "Right leg, leaving the loop end"
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/omega-spring.scad",
+      "kind": "function",
+      "name": "hook_path",
+      "signature": "function hook_path()",
+      "params": [],
+      "doc": "Right end coil: a bend toward the axis, a straight diagonal, then a counterclockwise coil (opposite to the big loop)"
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/omega-spring.scad",
+      "kind": "function",
+      "name": "handle_path",
+      "signature": "function handle_path()",
+      "params": [],
+      "doc": "Right handle stub, leaving the coil end outward into the bar"
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/omega-spring.scad",
+      "kind": "function",
+      "name": "bar_outline",
+      "signature": "function bar_outline()",
+      "params": [],
+      "doc": "Grip bar leaning away from the middle axis"
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/omega-spring.scad",
+      "kind": "function",
+      "name": "loop_path",
+      "signature": "function loop_path()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/omega-spring.scad",
+      "kind": "function",
+      "name": "omega_path",
+      "signature": "function omega_path()",
+      "params": [],
+      "doc": "Omega centerline from the left handle over the loop to the right handle"
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/omega-spring.scad",
+      "kind": "function",
+      "name": "handle_outline",
+      "signature": "function handle_outline()",
+      "params": [],
+      "doc": "Stub and bar merged, with concave corners filled out into a flared root"
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/omega-spring.scad",
+      "kind": "function",
+      "name": "spring_outline",
+      "signature": "function spring_outline()",
+      "params": [],
+      "doc": "Outline of the loop, hooks, stubs and bars, merged so the chamfer runs uninterrupted"
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/omega-spring.scad",
+      "kind": "module",
+      "name": "omega_spring",
+      "signature": "module omega_spring()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/omega-spring.scad",
+      "kind": "module",
+      "name": "assembly",
+      "signature": "module assembly()",
+      "params": [],
+      "doc": "==================================================================== Main Assembly & Plates ===================================================================="
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/omega-spring.scad",
+      "kind": "module",
+      "name": "mw_plate_1",
+      "signature": "module mw_plate_1()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/snap-fit.scad",
+      "kind": "module",
+      "name": "see_through",
+      "signature": "module see_through(base_color=\"grey\", alpha=0.6)",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"grey\""
+        },
+        {
+          "name": "alpha",
+          "default": "0.6"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/snap-fit.scad",
+      "kind": "module",
+      "name": "chamfered_extrude",
+      "signature": "module chamfered_extrude(region, h, bottom=true, top=true)",
+      "params": [
+        {
+          "name": "region",
+          "default": ""
+        },
+        {
+          "name": "h",
+          "default": ""
+        },
+        {
+          "name": "bottom",
+          "default": "true"
+        },
+        {
+          "name": "top",
+          "default": "true"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/snap-fit.scad",
+      "kind": "module",
+      "name": "solid",
+      "signature": "module solid(base_color=\"red\")",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"red\""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/snap-fit.scad",
+      "kind": "function",
+      "name": "fixed_bar_profile",
+      "signature": "function fixed_bar_profile()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/snap-fit.scad",
+      "kind": "module",
+      "name": "fixed_bar",
+      "signature": "module fixed_bar()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/snap-fit.scad",
+      "kind": "function",
+      "name": "moving_bar_profile",
+      "signature": "function moving_bar_profile()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/snap-fit.scad",
+      "kind": "module",
+      "name": "moving_bar",
+      "signature": "module moving_bar()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/stabilizer-spring.scad",
+      "kind": "module",
+      "name": "see_through",
+      "signature": "module see_through(base_color=\"grey\", alpha=0.6)",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"grey\""
+        },
+        {
+          "name": "alpha",
+          "default": "0.6"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/stabilizer-spring.scad",
+      "kind": "module",
+      "name": "solid",
+      "signature": "module solid(base_color=\"red\")",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"red\""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/stabilizer-spring.scad",
+      "kind": "function",
+      "name": "wave_corners",
+      "signature": "function wave_corners()",
+      "params": [],
+      "doc": "Trapezoid wave corners: the flat projection of a helix with flat crests Handles overlap the ring walls by epsilon to fuse with them"
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/stabilizer-spring.scad",
+      "kind": "function",
+      "name": "wave_path",
+      "signature": "function wave_path()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/stabilizer-spring.scad",
+      "kind": "module",
+      "name": "chamfered_ring",
+      "signature": "module chamfered_ring()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/stabilizer-spring.scad",
+      "kind": "module",
+      "name": "inner_disk",
+      "signature": "module inner_disk()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/stabilizer-spring.scad",
+      "kind": "module",
+      "name": "wave_band",
+      "signature": "module wave_band()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/stabilizer-spring.scad",
+      "kind": "module",
+      "name": "joints",
+      "signature": "module joints()",
+      "params": [],
+      "doc": "Full-height blocks that bridge the ring chamfers at both spring ends; their faces inside the ring walls stay unchamfered"
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/stabilizer-spring.scad",
+      "kind": "module",
+      "name": "stabilizer_spring",
+      "signature": "module stabilizer_spring()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/stabilizer-spring.scad",
+      "kind": "module",
+      "name": "assembly",
+      "signature": "module assembly()",
+      "params": [],
+      "doc": "==================================================================== Main Assembly & Plates ===================================================================="
+    },
+    {
+      "topic": "springs",
+      "file": "parts/springs/stabilizer-spring.scad",
+      "kind": "module",
+      "name": "mw_plate_1",
+      "signature": "module mw_plate_1()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "joining",
+      "file": "parts/joining/dovetail.scad",
+      "kind": "function",
+      "name": "dovetail_flanged_wall_path",
+      "signature": "function dovetail_flanged_wall_path(width=dovetail_depth / 4, depth=dovetail_depth, angle=45, flange_width=object_thickness, tolerance=tolerance)",
+      "params": [
+        {
+          "name": "width",
+          "default": "dovetail_depth / 4"
+        },
+        {
+          "name": "depth",
+          "default": "dovetail_depth"
+        },
+        {
+          "name": "angle",
+          "default": "45"
+        },
+        {
+          "name": "flange_width",
+          "default": "object_thickness"
+        },
+        {
+          "name": "tolerance",
+          "default": "tolerance"
+        }
+      ],
+      "doc": "Generates an open 2D path with the dovetail shape"
+    },
+    {
+      "topic": "joining",
+      "file": "parts/joining/dovetail.scad",
+      "kind": "module",
+      "name": "dovetail_cutter",
+      "signature": "module dovetail_cutter(flange=object_thickness)",
+      "params": [
+        {
+          "name": "flange",
+          "default": "object_thickness"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "joining",
+      "file": "parts/joining/dovetail.scad",
+      "kind": "module",
+      "name": "main_body",
+      "signature": "module main_body()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "joining",
+      "file": "parts/joining/dovetail.scad",
+      "kind": "module",
+      "name": "mw_plate_1",
+      "signature": "module mw_plate_1()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "joining",
+      "file": "parts/joining/grip-fins.scad",
+      "kind": "function",
+      "name": "eps",
+      "signature": "function eps(dim)",
+      "params": [
+        {
+          "name": "dim",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "joining",
+      "file": "parts/joining/grip-fins.scad",
+      "kind": "module",
+      "name": "gripping_hole",
+      "signature": "module gripping_hole(depth, radius, fin_size, angle=75)",
+      "params": [
+        {
+          "name": "depth",
+          "default": ""
+        },
+        {
+          "name": "radius",
+          "default": ""
+        },
+        {
+          "name": "fin_size",
+          "default": ""
+        },
+        {
+          "name": "angle",
+          "default": "75"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "joining",
+      "file": "parts/joining/heat-insert.scad",
+      "kind": "module",
+      "name": "see_through",
+      "signature": "module see_through(base_color=\"grey\", alpha=0.6)",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"grey\""
+        },
+        {
+          "name": "alpha",
+          "default": "0.6"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "joining",
+      "file": "parts/joining/heat-insert.scad",
+      "kind": "module",
+      "name": "solid",
+      "signature": "module solid(base_color=\"red\")",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"red\""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "joining",
+      "file": "parts/joining/heat-insert.scad",
+      "kind": "module",
+      "name": "heat_insert_hole",
+      "signature": "module heat_insert_hole(depth=hole_depth, diameter=hole_diameter)",
+      "params": [
+        {
+          "name": "depth",
+          "default": "hole_depth"
+        },
+        {
+          "name": "diameter",
+          "default": "hole_diameter"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "joining",
+      "file": "parts/joining/heat-insert.scad",
+      "kind": "module",
+      "name": "sample_hole",
+      "signature": "module sample_hole()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "joining",
+      "file": "parts/joining/heat-insert.scad",
+      "kind": "module",
+      "name": "sample_block",
+      "signature": "module sample_block()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "joining",
+      "file": "parts/joining/square-dowel.scad",
+      "kind": "module",
+      "name": "see_through",
+      "signature": "module see_through(base_color=\"grey\")",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"grey\""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "joining",
+      "file": "parts/joining/square-dowel.scad",
+      "kind": "module",
+      "name": "solid",
+      "signature": "module solid(base_color=\"red\")",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"red\""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "joining",
+      "file": "parts/joining/square-dowel.scad",
+      "kind": "module",
+      "name": "square_dowel",
+      "signature": "module square_dowel(gap=0)",
+      "params": [
+        {
+          "name": "gap",
+          "default": "0"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "joining",
+      "file": "parts/joining/square-dowel.scad",
+      "kind": "module",
+      "name": "half_cube",
+      "signature": "module half_cube(slot_angle=45)",
+      "params": [
+        {
+          "name": "slot_angle",
+          "default": "45"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "joining",
+      "file": "parts/joining/vertical-sturdy-plug.scad",
+      "kind": "module",
+      "name": "tapered_plug",
+      "signature": "module tapered_plug()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "joining",
+      "file": "parts/joining/vertical-sturdy-plug.scad",
+      "kind": "module",
+      "name": "cross_hollow",
+      "signature": "module cross_hollow(length, depth)",
+      "params": [
+        {
+          "name": "length",
+          "default": ""
+        },
+        {
+          "name": "depth",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "joining",
+      "file": "parts/joining/vertical-sturdy-plug.scad",
+      "kind": "module",
+      "name": "chamfered_base_cuboid",
+      "signature": "module chamfered_base_cuboid(w, d, h, chamfer)",
+      "params": [
+        {
+          "name": "w",
+          "default": ""
+        },
+        {
+          "name": "d",
+          "default": ""
+        },
+        {
+          "name": "h",
+          "default": ""
+        },
+        {
+          "name": "chamfer",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "joining",
+      "file": "parts/joining/vertical-sturdy-plug.scad",
+      "kind": "module",
+      "name": "plug_ribs",
+      "signature": "module plug_ribs()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "joining",
+      "file": "parts/joining/vertical-sturdy-plug.scad",
+      "kind": "module",
+      "name": "plug_cuboid",
+      "signature": "module plug_cuboid()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "joining",
+      "file": "parts/joining/vertical-sturdy-plug.scad",
+      "kind": "module",
+      "name": "hole_cuboid",
+      "signature": "module hole_cuboid()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "mechanisms",
+      "file": "parts/mechanisms/hinge.scad",
+      "kind": "module",
+      "name": "hinge",
+      "signature": "module hinge(outer_diameter=outer_diameter, inner_diameter=inner_diameter, height=height)",
+      "params": [
+        {
+          "name": "outer_diameter",
+          "default": "outer_diameter"
+        },
+        {
+          "name": "inner_diameter",
+          "default": "inner_diameter"
+        },
+        {
+          "name": "height",
+          "default": "height"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "mechanisms",
+      "file": "parts/mechanisms/over-center-latch.scad",
+      "kind": "module",
+      "name": "body_2d",
+      "signature": "module body_2d()",
+      "params": [],
+      "doc": "Body outline: hub, top edge, right edge, rounded corner, and a lower edge running at slope_angle up to the top of the socket circle."
+    },
+    {
+      "topic": "mechanisms",
+      "file": "parts/mechanisms/over-center-latch.scad",
+      "kind": "module",
+      "name": "link_2d",
+      "signature": "module link_2d()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "mechanisms",
+      "file": "parts/mechanisms/over-center-latch.scad",
+      "kind": "module",
+      "name": "body",
+      "signature": "module body()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "mechanisms",
+      "file": "parts/mechanisms/over-center-latch.scad",
+      "kind": "module",
+      "name": "link",
+      "signature": "module link()",
+      "params": [],
+      "doc": "Link lying in the XY plane, hub axis at the origin, +X towards the socket"
+    },
+    {
+      "topic": "mechanisms",
+      "file": "parts/mechanisms/over-center-latch.scad",
+      "kind": "module",
+      "name": "assembly",
+      "signature": "module assembly()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "mechanisms",
+      "file": "parts/mechanisms/over-center-latch.scad",
+      "kind": "module",
+      "name": "printable",
+      "signature": "module printable()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/diamond-tread.scad",
+      "kind": "module",
+      "name": "raised_diamond",
+      "signature": "module raised_diamond(x, y, orientation=0)",
+      "params": [
+        {
+          "name": "x",
+          "default": ""
+        },
+        {
+          "name": "y",
+          "default": ""
+        },
+        {
+          "name": "orientation",
+          "default": "0"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/diamond-tread.scad",
+      "kind": "module",
+      "name": "diamond_tread_plate",
+      "signature": "module diamond_tread_plate()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/diamonds.scad",
+      "kind": "module",
+      "name": "diamond_groove",
+      "signature": "module diamond_groove(direction)",
+      "params": [
+        {
+          "name": "direction",
+          "default": ""
+        }
+      ],
+      "doc": "V-shaped notch: wide at the surface, tapering to a point at groove_depth."
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/diamonds.scad",
+      "kind": "module",
+      "name": "diamond_grooves",
+      "signature": "module diamond_grooves(direction)",
+      "params": [
+        {
+          "name": "direction",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/diamonds.scad",
+      "kind": "module",
+      "name": "diamond_grooves_trimmed",
+      "signature": "module diamond_grooves_trimmed()",
+      "params": [],
+      "doc": "Confine the crossed grooves to the mid-section so the top and bottom rims stay solid, giving clean, ungrooved ends."
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/diamonds.scad",
+      "kind": "module",
+      "name": "diamond_cylinder",
+      "signature": "module diamond_cylinder()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/japandi.scad",
+      "kind": "function",
+      "name": "ripple_angle",
+      "signature": "function ripple_angle(index, z)",
+      "params": [
+        {
+          "name": "index",
+          "default": ""
+        },
+        {
+          "name": "z",
+          "default": ""
+        }
+      ],
+      "doc": "A softly wandering centerline for one recessed ripple."
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/japandi.scad",
+      "kind": "function",
+      "name": "ripple_point",
+      "signature": "function ripple_point(index, z)",
+      "params": [
+        {
+          "name": "index",
+          "default": ""
+        },
+        {
+          "name": "z",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/japandi.scad",
+      "kind": "module",
+      "name": "ripple_cutter",
+      "signature": "module ripple_cutter(index)",
+      "params": [
+        {
+          "name": "index",
+          "default": ""
+        }
+      ],
+      "doc": "Hulling neighboring spheres makes a continuous, rounded groove cutter."
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/japandi.scad",
+      "kind": "module",
+      "name": "ripple_cutters",
+      "signature": "module ripple_cutters()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/japandi.scad",
+      "kind": "module",
+      "name": "japandi_cylinder",
+      "signature": "module japandi_cylinder()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/knurling.scad",
+      "kind": "module",
+      "name": "helical_rib",
+      "signature": "module helical_rib(direction)",
+      "params": [
+        {
+          "name": "direction",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/knurling.scad",
+      "kind": "module",
+      "name": "knurling",
+      "signature": "module knurling(direction)",
+      "params": [
+        {
+          "name": "direction",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/knurling.scad",
+      "kind": "module",
+      "name": "knurled_cylinder",
+      "signature": "module knurled_cylinder()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/ribbing.scad",
+      "kind": "module",
+      "name": "rounded_rib",
+      "signature": "module rounded_rib()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/ribbing.scad",
+      "kind": "module",
+      "name": "ribbing",
+      "signature": "module ribbing()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/ribbing.scad",
+      "kind": "module",
+      "name": "rib_ring",
+      "signature": "module rib_ring(z_center)",
+      "params": [
+        {
+          "name": "z_center",
+          "default": ""
+        }
+      ],
+      "doc": "Encircling band matching the rib's radial and vertical thickness."
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/ribbing.scad",
+      "kind": "module",
+      "name": "rib_rings",
+      "signature": "module rib_rings()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/ribbing.scad",
+      "kind": "module",
+      "name": "ribbed_cylinder",
+      "signature": "module ribbed_cylinder()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/stippling.scad",
+      "kind": "module",
+      "name": "stipple",
+      "signature": "module stipple(row, column)",
+      "params": [
+        {
+          "name": "row",
+          "default": ""
+        },
+        {
+          "name": "column",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/stippling.scad",
+      "kind": "module",
+      "name": "stippling",
+      "signature": "module stippling()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/stippling.scad",
+      "kind": "module",
+      "name": "stippled_cylinder",
+      "signature": "module stippled_cylinder()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/waves.scad",
+      "kind": "function",
+      "name": "rib_angle",
+      "signature": "function rib_angle(index, z)",
+      "params": [
+        {
+          "name": "index",
+          "default": ""
+        },
+        {
+          "name": "z",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/waves.scad",
+      "kind": "function",
+      "name": "rib_point",
+      "signature": "function rib_point(index, z)",
+      "params": [
+        {
+          "name": "index",
+          "default": ""
+        },
+        {
+          "name": "z",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/waves.scad",
+      "kind": "module",
+      "name": "rib_profile",
+      "signature": "module rib_profile(index, z)",
+      "params": [
+        {
+          "name": "index",
+          "default": ""
+        },
+        {
+          "name": "z",
+          "default": ""
+        }
+      ],
+      "doc": "Hulled ellipses keep each rib smooth while its centerline follows the wave."
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/waves.scad",
+      "kind": "module",
+      "name": "wavy_rib",
+      "signature": "module wavy_rib(index)",
+      "params": [
+        {
+          "name": "index",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/waves.scad",
+      "kind": "module",
+      "name": "wavy_ribs",
+      "signature": "module wavy_ribs()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/waves.scad",
+      "kind": "module",
+      "name": "chamfered_base",
+      "signature": "module chamfered_base()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/waves.scad",
+      "kind": "module",
+      "name": "chamfer_rings",
+      "signature": "module chamfer_rings()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "textures",
+      "file": "parts/textures/waves.scad",
+      "kind": "module",
+      "name": "waves_cylinder",
+      "signature": "module waves_cylinder()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "solids",
+      "file": "parts/disks-and-washers.scad",
+      "kind": "function",
+      "name": "f",
+      "signature": "function f(y)",
+      "params": [
+        {
+          "name": "y",
+          "default": ""
+        }
+      ],
+      "doc": "Outer function: defines the outer curve in the region as a function of y"
+    },
+    {
+      "topic": "solids",
+      "file": "parts/disks-and-washers.scad",
+      "kind": "function",
+      "name": "g",
+      "signature": "function g(y)",
+      "params": [
+        {
+          "name": "y",
+          "default": ""
+        }
+      ],
+      "doc": "Inner function: defines the inner curve in the region as a function of y Set g(y) = 0 to automatically switch to disk method (no hole)"
+    },
+    {
+      "topic": "solids",
+      "file": "parts/disks-and-washers.scad",
+      "kind": "module",
+      "name": "washer",
+      "signature": "module washer(z_bottom, r_outer, r_inner, thickness)",
+      "params": [
+        {
+          "name": "z_bottom",
+          "default": ""
+        },
+        {
+          "name": "r_outer",
+          "default": ""
+        },
+        {
+          "name": "r_inner",
+          "default": ""
+        },
+        {
+          "name": "thickness",
+          "default": ""
+        }
+      ],
+      "doc": "Washer Module: creates a washer at a given z position"
+    },
+    {
+      "topic": "solids",
+      "file": "parts/disks-and-washers.scad",
+      "kind": "module",
+      "name": "solid_surface",
+      "signature": "module solid_surface()",
+      "params": [],
+      "doc": "Solid Surface Module: creates a full continuous solid of revolution"
+    },
+    {
+      "topic": "solids",
+      "file": "parts/disks-and-washers.scad",
+      "kind": "function",
+      "name": "sample_z",
+      "signature": "function sample_z(i, interval, a)",
+      "params": [
+        {
+          "name": "i",
+          "default": ""
+        },
+        {
+          "name": "interval",
+          "default": ""
+        },
+        {
+          "name": "a",
+          "default": ""
+        }
+      ],
+      "doc": "Sample point selection based on sampling method"
+    },
+    {
+      "topic": "solids",
+      "file": "parts/hull.scad",
+      "kind": "module",
+      "name": "see_through",
+      "signature": "module see_through(base_color=\"grey\", alpha=0.6)",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"grey\""
+        },
+        {
+          "name": "alpha",
+          "default": "0.6"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "solids",
+      "file": "parts/hull.scad",
+      "kind": "module",
+      "name": "solid",
+      "signature": "module solid(base_color=\"red\")",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"red\""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "solids",
+      "file": "parts/hull.scad",
+      "kind": "module",
+      "name": "stadium_plate",
+      "signature": "module stadium_plate()",
+      "params": [],
+      "doc": "Two discs joined by hull() make a stadium-shaped plate"
+    },
+    {
+      "topic": "solids",
+      "file": "parts/hull.scad",
+      "kind": "module",
+      "name": "adapter_shape",
+      "signature": "module adapter_shape(square_size, round_d, h)",
+      "params": [
+        {
+          "name": "square_size",
+          "default": ""
+        },
+        {
+          "name": "round_d",
+          "default": ""
+        },
+        {
+          "name": "h",
+          "default": ""
+        }
+      ],
+      "doc": "A thin square slice at the bottom and a thin disc at the top; the hull blends between them, so a smaller copy subtracted gives a hollow adapter"
+    },
+    {
+      "topic": "solids",
+      "file": "parts/hull.scad",
+      "kind": "module",
+      "name": "adapter",
+      "signature": "module adapter()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "solids",
+      "file": "parts/hull.scad",
+      "kind": "module",
+      "name": "bracket",
+      "signature": "module bracket()",
+      "params": [],
+      "doc": "Base plate hulled with an offset post: the hull creates the smooth sloped flank without manual polyhedron work"
+    },
+    {
+      "topic": "solids",
+      "file": "parts/hull.scad",
+      "kind": "module",
+      "name": "assembly",
+      "signature": "module assembly()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "solids",
+      "file": "parts/hull.scad",
+      "kind": "module",
+      "name": "mw_plate_1",
+      "signature": "module mw_plate_1()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "solids",
+      "file": "parts/hull.scad",
+      "kind": "module",
+      "name": "mw_plate_2",
+      "signature": "module mw_plate_2()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "solids",
+      "file": "parts/hull.scad",
+      "kind": "module",
+      "name": "mw_plate_3",
+      "signature": "module mw_plate_3()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "solids",
+      "file": "parts/ibeam.scad",
+      "kind": "function",
+      "name": "eps",
+      "signature": "function eps(dim)",
+      "params": [
+        {
+          "name": "dim",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "solids",
+      "file": "parts/ibeam.scad",
+      "kind": "module",
+      "name": "ibeam",
+      "signature": "module ibeam(length, width, height, wall=1.5)",
+      "params": [
+        {
+          "name": "length",
+          "default": ""
+        },
+        {
+          "name": "width",
+          "default": ""
+        },
+        {
+          "name": "height",
+          "default": ""
+        },
+        {
+          "name": "wall",
+          "default": "1.5"
+        }
+      ],
+      "doc": "rotational extrusion of an ellipsoid with its center at `radius`"
+    },
+    {
+      "topic": "solids",
+      "file": "parts/rounded-cubes.scad",
+      "kind": "module",
+      "name": "chamfered_cube",
+      "signature": "module chamfered_cube(width, depth, height, chamfer)",
+      "params": [
+        {
+          "name": "width",
+          "default": ""
+        },
+        {
+          "name": "depth",
+          "default": ""
+        },
+        {
+          "name": "height",
+          "default": ""
+        },
+        {
+          "name": "chamfer",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "solids",
+      "file": "parts/shells.scad",
+      "kind": "function",
+      "name": "f",
+      "signature": "function f(x)",
+      "params": [
+        {
+          "name": "x",
+          "default": ""
+        }
+      ],
+      "doc": "Top function: defines top surface y = f(x)"
+    },
+    {
+      "topic": "solids",
+      "file": "parts/shells.scad",
+      "kind": "function",
+      "name": "g",
+      "signature": "function g(x)",
+      "params": [
+        {
+          "name": "x",
+          "default": ""
+        }
+      ],
+      "doc": "Bottom function: defines bottom surface y = g(x)"
+    },
+    {
+      "topic": "solids",
+      "file": "parts/shells.scad",
+      "kind": "module",
+      "name": "shell",
+      "signature": "module shell(r_mid, z_bottom, height, thickness)",
+      "params": [
+        {
+          "name": "r_mid",
+          "default": ""
+        },
+        {
+          "name": "z_bottom",
+          "default": ""
+        },
+        {
+          "name": "height",
+          "default": ""
+        },
+        {
+          "name": "thickness",
+          "default": ""
+        }
+      ],
+      "doc": "Shell Module: creates a thin hollow cylindrical shell"
+    },
+    {
+      "topic": "solids",
+      "file": "parts/shells.scad",
+      "kind": "module",
+      "name": "solid_surface",
+      "signature": "module solid_surface()",
+      "params": [],
+      "doc": "Solid Surface Module: generates full continuous solid by revolving region"
+    },
+    {
+      "topic": "solids",
+      "file": "parts/shells.scad",
+      "kind": "function",
+      "name": "sample_x",
+      "signature": "function sample_x(i, interval, a)",
+      "params": [
+        {
+          "name": "i",
+          "default": ""
+        },
+        {
+          "name": "interval",
+          "default": ""
+        },
+        {
+          "name": "a",
+          "default": ""
+        }
+      ],
+      "doc": "Selects sample point for a subinterval based on sampling method"
+    },
+    {
+      "topic": "solids",
+      "file": "parts/support-fin.scad",
+      "kind": "module",
+      "name": "support_fin",
+      "signature": "module support_fin(size, thickness)",
+      "params": [
+        {
+          "name": "size",
+          "default": ""
+        },
+        {
+          "name": "thickness",
+          "default": ""
+        }
+      ],
+      "doc": "Creates a triangular gusset with its long edges on the X and Z axes."
+    },
+    {
+      "topic": "solids",
+      "file": "parts/torus.scad",
+      "kind": "module",
+      "name": "torus",
+      "signature": "module torus(radius, rx, ry, arc=360)",
+      "params": [
+        {
+          "name": "radius",
+          "default": ""
+        },
+        {
+          "name": "rx",
+          "default": ""
+        },
+        {
+          "name": "ry",
+          "default": ""
+        },
+        {
+          "name": "arc",
+          "default": "360"
+        }
+      ],
+      "doc": "rotational extrusion of an ellipsoid with its center at `radius`"
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/attach2.scad",
+      "kind": "module",
+      "name": "cube_with_bottom_hole",
+      "signature": "module cube_with_bottom_hole(size=20, hole=10, depth=10)",
+      "params": [
+        {
+          "name": "size",
+          "default": "20"
+        },
+        {
+          "name": "hole",
+          "default": "10"
+        },
+        {
+          "name": "depth",
+          "default": "10"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/bridged-hole.scad",
+      "kind": "function",
+      "name": "strip_angle",
+      "signature": "function strip_angle(i)",
+      "params": [
+        {
+          "name": "i",
+          "default": ""
+        }
+      ],
+      "doc": "Strips are evenly spread over 180 degrees"
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/bridged-hole.scad",
+      "kind": "function",
+      "name": "strip_halfwidth",
+      "signature": "function strip_halfwidth(k)",
+      "params": [
+        {
+          "name": "k",
+          "default": ""
+        }
+      ],
+      "doc": "Strip half-width on layer k"
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/bridged-hole.scad",
+      "kind": "module",
+      "name": "see_through",
+      "signature": "module see_through(base_color=\"grey\", alpha=0.6)",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"grey\""
+        },
+        {
+          "name": "alpha",
+          "default": "0.6"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/bridged-hole.scad",
+      "kind": "module",
+      "name": "solid",
+      "signature": "module solid(base_color=\"red\")",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"red\""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/bridged-hole.scad",
+      "kind": "module",
+      "name": "nut_pocket",
+      "signature": "module nut_pocket()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/bridged-hole.scad",
+      "kind": "module",
+      "name": "bridge",
+      "signature": "module bridge(k)",
+      "params": [
+        {
+          "name": "k",
+          "default": ""
+        }
+      ],
+      "doc": "Bridge k: the part of the hexagon outside the polygon of layer k. It starts at its own layer and is extruded up to the top of the stack, so later bridges never span gaps left by earlier ones."
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/bridged-hole.scad",
+      "kind": "module",
+      "name": "bridge_opening",
+      "signature": "module bridge_opening(k)",
+      "params": [
+        {
+          "name": "k",
+          "default": ""
+        }
+      ],
+      "doc": "Opening of layer k: all strips of that layer intersected"
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/bridged-hole.scad",
+      "kind": "module",
+      "name": "nut_cavity",
+      "signature": "module nut_cavity()",
+      "params": [],
+      "doc": "The hexagonal pocket and the room above it, minus all the bridges"
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/bridged-hole.scad",
+      "kind": "module",
+      "name": "screw_hole",
+      "signature": "module screw_hole()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/bridged-hole.scad",
+      "kind": "module",
+      "name": "cavity",
+      "signature": "module cavity()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/bridged-hole.scad",
+      "kind": "module",
+      "name": "assembly",
+      "signature": "module assembly()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/holes-grid.scad",
+      "kind": "module",
+      "name": "chamfered_cube",
+      "signature": "module chamfered_cube(width, depth, height, chamfer)",
+      "params": [
+        {
+          "name": "width",
+          "default": ""
+        },
+        {
+          "name": "depth",
+          "default": ""
+        },
+        {
+          "name": "height",
+          "default": ""
+        },
+        {
+          "name": "chamfer",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/holes-grid.scad",
+      "kind": "module",
+      "name": "hole_grid",
+      "signature": "module hole_grid()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/holes-grid.scad",
+      "kind": "module",
+      "name": "perforated_plate",
+      "signature": "module perforated_plate()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/name-plate.scad",
+      "kind": "module",
+      "name": "plate_body",
+      "signature": "module plate_body()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/name-plate.scad",
+      "kind": "module",
+      "name": "plate_text",
+      "signature": "module plate_text(depth=recess_depth, delta=0)",
+      "params": [
+        {
+          "name": "depth",
+          "default": "recess_depth"
+        },
+        {
+          "name": "delta",
+          "default": "0"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/name-plate.scad",
+      "kind": "module",
+      "name": "name_plate",
+      "signature": "module name_plate()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/screw-post.scad",
+      "kind": "module",
+      "name": "see_through",
+      "signature": "module see_through(base_color=\"grey\", alpha=0.6)",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"grey\""
+        },
+        {
+          "name": "alpha",
+          "default": "0.6"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/screw-post.scad",
+      "kind": "module",
+      "name": "solid",
+      "signature": "module solid(base_color=\"red\")",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"red\""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/screw-post.scad",
+      "kind": "module",
+      "name": "post_body",
+      "signature": "module post_body()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/screw-post.scad",
+      "kind": "module",
+      "name": "screw_hole",
+      "signature": "module screw_hole()",
+      "params": [],
+      "doc": "Vertical shank hole from the top face down to two nut thicknesses below the nut slot"
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/screw-post.scad",
+      "kind": "module",
+      "name": "nut_slot",
+      "signature": "module nut_slot()",
+      "params": [],
+      "doc": "Horizontal hex nut pocket at the screw tip that opens onto the +X side"
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/screw-post.scad",
+      "kind": "module",
+      "name": "screw_post",
+      "signature": "module screw_post()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/screw-post.scad",
+      "kind": "module",
+      "name": "assembly",
+      "signature": "module assembly()",
+      "params": [],
+      "doc": "==================================================================== Main Assembly & Plates ===================================================================="
+    },
+    {
+      "topic": "bosl2",
+      "file": "bosl2/screw-post.scad",
+      "kind": "module",
+      "name": "mw_plate_1",
+      "signature": "module mw_plate_1()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-bayonet-connectors/hose-connector-multi-plate.scad",
+      "kind": "function",
+      "name": "sin_factor",
+      "signature": "function sin_factor(n, slopes=2)",
+      "params": [
+        {
+          "name": "n",
+          "default": ""
+        },
+        {
+          "name": "slopes",
+          "default": "2"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-bayonet-connectors/hose-connector-multi-plate.scad",
+      "kind": "function",
+      "name": "stay",
+      "signature": "function stay(n1, n2=scenes-1)",
+      "params": [
+        {
+          "name": "n1",
+          "default": ""
+        },
+        {
+          "name": "n2",
+          "default": "scenes-1"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-bayonet-connectors/hose-connector-multi-plate.scad",
+      "kind": "module",
+      "name": "torus",
+      "signature": "module torus(radius, rx, ry, arc=360)",
+      "params": [
+        {
+          "name": "radius",
+          "default": ""
+        },
+        {
+          "name": "rx",
+          "default": ""
+        },
+        {
+          "name": "ry",
+          "default": ""
+        },
+        {
+          "name": "arc",
+          "default": "360"
+        }
+      ],
+      "doc": "rotational extrusion of an ellipsoid with its center at `radius`"
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-bayonet-connectors/hose-connector-multi-plate.scad",
+      "kind": "module",
+      "name": "top_lead_in_rim",
+      "signature": "module top_lead_in_rim(radius)",
+      "params": [
+        {
+          "name": "radius",
+          "default": ""
+        }
+      ],
+      "doc": "Convex Lead-In Rim Profile: A solid 90° quarter-circle arc centered at (inner_radius, 0), sweeping UPWARD and OUTWARD towards outer_radius."
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-bayonet-connectors/hose-connector-multi-plate.scad",
+      "kind": "module",
+      "name": "tube_bevel",
+      "signature": "module tube_bevel(radius)",
+      "params": [
+        {
+          "name": "radius",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-bayonet-connectors/hose-connector-multi-plate.scad",
+      "kind": "module",
+      "name": "mw_plate_1",
+      "signature": "module mw_plate_1()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-bayonet-connectors/hose-connector-multi-plate.scad",
+      "kind": "module",
+      "name": "mw_plate_2",
+      "signature": "module mw_plate_2()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-bayonet-connectors/hose-connector-multi-plate.scad",
+      "kind": "module",
+      "name": "mw_plate_3",
+      "signature": "module mw_plate_3()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-bayonet-connectors/hose-connector-multi-plate.scad",
+      "kind": "module",
+      "name": "female_connector",
+      "signature": "module female_connector(view_angle, tube_extension=false)",
+      "params": [
+        {
+          "name": "view_angle",
+          "default": ""
+        },
+        {
+          "name": "tube_extension",
+          "default": "false"
+        }
+      ],
+      "doc": "==================================================================== Female Connector ===================================================================="
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-bayonet-connectors/hose-connector-multi-plate.scad",
+      "kind": "module",
+      "name": "female_tube_transition",
+      "signature": "module female_tube_transition(r1, r2, height, thickness)",
+      "params": [
+        {
+          "name": "r1",
+          "default": ""
+        },
+        {
+          "name": "r2",
+          "default": ""
+        },
+        {
+          "name": "height",
+          "default": ""
+        },
+        {
+          "name": "thickness",
+          "default": ""
+        }
+      ],
+      "doc": "==================================================================== For the adapter geometry, this connects the ring with the wider tube"
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-bayonet-connectors/hose-connector-multi-plate.scad",
+      "kind": "module",
+      "name": "female_outside_ring",
+      "signature": "module female_outside_ring()",
+      "params": [],
+      "doc": "==================================================================== The ring at the bottom holding the bayonet slots"
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-bayonet-connectors/hose-connector-multi-plate.scad",
+      "kind": "module",
+      "name": "female_twist_indicators",
+      "signature": "module female_twist_indicators()",
+      "params": [],
+      "doc": "==================================================================== Symbols to indicate open/close direction for twisting"
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-bayonet-connectors/hose-connector-multi-plate.scad",
+      "kind": "module",
+      "name": "female_bayonet_slots",
+      "signature": "module female_bayonet_slots()",
+      "params": [],
+      "doc": "==================================================================== Positive model of the L-shaped slots; gets carved out in the female_outside_ring() module"
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-bayonet-connectors/hose-connector-multi-plate.scad",
+      "kind": "module",
+      "name": "male_connector",
+      "signature": "module male_connector(view_angle)",
+      "params": [
+        {
+          "name": "view_angle",
+          "default": ""
+        }
+      ],
+      "doc": "==================================================================== Male Connector ===================================================================="
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-bayonet-connectors/hose-connector-multi-plate.scad",
+      "kind": "module",
+      "name": "male_locking_lugs",
+      "signature": "module male_locking_lugs()",
+      "params": [],
+      "doc": "Square-section ring with four gaps sized to leave the requested lug arc length"
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-bayonet-connectors/hose-connector-multi-plate.scad",
+      "kind": "module",
+      "name": "ac_hose",
+      "signature": "module ac_hose(length=40, cuff_len=locking_lug_size, inne_diameter=_hose_diameter, wall=wall_thickness, wire_r=250, pitch=12)",
+      "params": [
+        {
+          "name": "length",
+          "default": "40"
+        },
+        {
+          "name": "cuff_len",
+          "default": "locking_lug_size"
+        },
+        {
+          "name": "inne_diameter",
+          "default": "_hose_diameter"
+        },
+        {
+          "name": "wall",
+          "default": "wall_thickness"
+        },
+        {
+          "name": "wire_r",
+          "default": "250"
+        },
+        {
+          "name": "pitch",
+          "default": "12"
+        }
+      ],
+      "doc": "==================================================================== AC PVC Hose (for animation) ===================================================================="
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-drain-pan/ac-drain-pan.scad",
+      "kind": "module",
+      "name": "chamfered_rect",
+      "signature": "module chamfered_rect(width, depth, chamfer)",
+      "params": [
+        {
+          "name": "width",
+          "default": ""
+        },
+        {
+          "name": "depth",
+          "default": ""
+        },
+        {
+          "name": "chamfer",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-drain-pan/ac-drain-pan.scad",
+      "kind": "module",
+      "name": "tapered_prism",
+      "signature": "module tapered_prism(bottom_w, bottom_d, top_w, top_d, height, chamfer=0)",
+      "params": [
+        {
+          "name": "bottom_w",
+          "default": ""
+        },
+        {
+          "name": "bottom_d",
+          "default": ""
+        },
+        {
+          "name": "top_w",
+          "default": ""
+        },
+        {
+          "name": "top_d",
+          "default": ""
+        },
+        {
+          "name": "height",
+          "default": ""
+        },
+        {
+          "name": "chamfer",
+          "default": "0"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-drain-pan/ac-drain-pan.scad",
+      "kind": "module",
+      "name": "pan_outer",
+      "signature": "module pan_outer()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-drain-pan/ac-drain-pan.scad",
+      "kind": "module",
+      "name": "pan_cavity",
+      "signature": "module pan_cavity()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-drain-pan/ac-drain-pan.scad",
+      "kind": "module",
+      "name": "rounded_rect",
+      "signature": "module rounded_rect(width, height, radius)",
+      "params": [
+        {
+          "name": "width",
+          "default": ""
+        },
+        {
+          "name": "height",
+          "default": ""
+        },
+        {
+          "name": "radius",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-drain-pan/ac-drain-pan.scad",
+      "kind": "module",
+      "name": "handle",
+      "signature": "module handle(side)",
+      "params": [
+        {
+          "name": "side",
+          "default": ""
+        }
+      ],
+      "doc": "A U profile made by extruding the upper half of a rounded-rectangle ring."
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-drain-pan/ac-drain-pan.scad",
+      "kind": "module",
+      "name": "handle_pillars",
+      "signature": "module handle_pillars(side)",
+      "params": [
+        {
+          "name": "side",
+          "default": ""
+        }
+      ],
+      "doc": "Square end pillars extend each handle leg to the bottom and follow the tapered outer wall instead of using separate wedges."
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-drain-pan/ac-drain-pan.scad",
+      "kind": "module",
+      "name": "spout_channel",
+      "signature": "module spout_channel()",
+      "params": [],
+      "doc": "Rectangular U-channel on the back (+Y) wall, open upward and inward."
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-drain-pan/ac-drain-pan.scad",
+      "kind": "module",
+      "name": "spout_half_cylinder",
+      "signature": "module spout_half_cylinder()",
+      "params": [],
+      "doc": "Vertical hollow half-cylinder, with its opening facing into the pan."
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-drain-pan/ac-drain-pan.scad",
+      "kind": "module",
+      "name": "spout_opening",
+      "signature": "module spout_opening()",
+      "params": [],
+      "doc": "Cut the back wall away so the rectangular channel opens into the cavity."
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-hose-connector-intake/hose-connector-intake.scad",
+      "kind": "module",
+      "name": "base_plate_shape",
+      "signature": "module base_plate_shape(s, h, r, c)",
+      "params": [
+        {
+          "name": "s",
+          "default": ""
+        },
+        {
+          "name": "h",
+          "default": ""
+        },
+        {
+          "name": "r",
+          "default": ""
+        },
+        {
+          "name": "c",
+          "default": ""
+        }
+      ],
+      "doc": "Base plate with rounded corners and bottom edge chamfer"
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-hose-connector-intake/hose-connector-intake.scad",
+      "kind": "module",
+      "name": "corner_chamfered_cylinder",
+      "signature": "module corner_chamfered_cylinder(h, r, c)",
+      "params": [
+        {
+          "name": "h",
+          "default": ""
+        },
+        {
+          "name": "r",
+          "default": ""
+        },
+        {
+          "name": "c",
+          "default": ""
+        }
+      ],
+      "doc": "Individual corner post with 45-degree chamfer at the bottom"
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-hose-connector-intake/hose-connector-intake.scad",
+      "kind": "module",
+      "name": "top_lead_in_rim",
+      "signature": "module top_lead_in_rim()",
+      "params": [],
+      "doc": "Convex Lead-In Rim Profile: A solid 90° quarter-circle arc centered at (inner_radius, 0), sweeping UPWARD and OUTWARD towards outer_radius."
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-hose-connector-intake/hose-connector-intake.scad",
+      "kind": "module",
+      "name": "foam_tape_grooves",
+      "signature": "module foam_tape_grooves()",
+      "params": [],
+      "doc": "Perimeter grooves cut directly out of the base plate top surface"
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-hose-connector-intake/hose-connector-intake.scad",
+      "kind": "module",
+      "name": "mounting_screw_holes",
+      "signature": "module mounting_screw_holes()",
+      "params": [],
+      "doc": "Four M4 clearance holes positioned inward from the base plate rim"
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-hose-connector-intake/hose-connector-intake.scad",
+      "kind": "module",
+      "name": "honeycomb_grid",
+      "signature": "module honeycomb_grid(size, height, cell_flat_to_flat, wall_thick)",
+      "params": [
+        {
+          "name": "size",
+          "default": ""
+        },
+        {
+          "name": "height",
+          "default": ""
+        },
+        {
+          "name": "cell_flat_to_flat",
+          "default": ""
+        },
+        {
+          "name": "wall_thick",
+          "default": ""
+        }
+      ],
+      "doc": "Honeycomb Screen Module"
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-hose-connector-intake/vent-cover-grill.scad",
+      "kind": "module",
+      "name": "ellipsoid_segment",
+      "signature": "module ellipsoid_segment()",
+      "params": [],
+      "doc": "--- Helper Module: Ellipsoid Segment ---"
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-intake-cover-side-extension/Side-Extension-Box.scad",
+      "kind": "module",
+      "name": "open_box_with_arc_corners",
+      "signature": "module open_box_with_arc_corners()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-intake-cover-side-extension/Side-Extension-Box.scad",
+      "kind": "module",
+      "name": "corner_arc_extension",
+      "signature": "module corner_arc_extension(r, t)",
+      "params": [
+        {
+          "name": "r",
+          "default": ""
+        },
+        {
+          "name": "t",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-intake-cover-side-extension/Side-Extension-Box.scad",
+      "kind": "module",
+      "name": "mitered_corner_wedge_hull_top",
+      "signature": "module mitered_corner_wedge_hull_top(size_x, rim_thick, supp_base, size_z)",
+      "params": [
+        {
+          "name": "size_x",
+          "default": ""
+        },
+        {
+          "name": "rim_thick",
+          "default": ""
+        },
+        {
+          "name": "supp_base",
+          "default": ""
+        },
+        {
+          "name": "size_z",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-intake-cover-side-extension/Side-Extension-Box.scad",
+      "kind": "module",
+      "name": "mitered_corner_wedge_hull_bottom",
+      "signature": "module mitered_corner_wedge_hull_bottom(size_x, rim_thick, supp_base, size_z)",
+      "params": [
+        {
+          "name": "size_x",
+          "default": ""
+        },
+        {
+          "name": "rim_thick",
+          "default": ""
+        },
+        {
+          "name": "supp_base",
+          "default": ""
+        },
+        {
+          "name": "size_z",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/ac-intake-cover-side-extension/Side-Extension-Box.scad",
+      "kind": "module",
+      "name": "outer_rim",
+      "signature": "module outer_rim()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/bambu-lab-a1/gantry-mount.scad",
+      "kind": "function",
+      "name": "dovetail_flanged_wall_path",
+      "signature": "function dovetail_flanged_wall_path(width=dovetail_depth / 4, depth=dovetail_depth, angle=45, flange_width=c230_arm_angle, tolerance=tolerance)",
+      "params": [
+        {
+          "name": "width",
+          "default": "dovetail_depth / 4"
+        },
+        {
+          "name": "depth",
+          "default": "dovetail_depth"
+        },
+        {
+          "name": "angle",
+          "default": "45"
+        },
+        {
+          "name": "flange_width",
+          "default": "c230_arm_angle"
+        },
+        {
+          "name": "tolerance",
+          "default": "tolerance"
+        }
+      ],
+      "doc": "Generates an open 2D path that wraps left/right along the front wall face"
+    },
+    {
+      "topic": "models",
+      "file": "models/bambu-lab-a1/gantry-mount.scad",
+      "kind": "module",
+      "name": "rounded_layer",
+      "signature": "module rounded_layer(size)",
+      "params": [
+        {
+          "name": "size",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/bambu-lab-a1/gantry-mount.scad",
+      "kind": "module",
+      "name": "bracket_block",
+      "signature": "module bracket_block(chamfer=0, extend_y=0, extend_z=0)",
+      "params": [
+        {
+          "name": "chamfer",
+          "default": "0"
+        },
+        {
+          "name": "extend_y",
+          "default": "0"
+        },
+        {
+          "name": "extend_z",
+          "default": "0"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/bambu-lab-a1/gantry-mount.scad",
+      "kind": "module",
+      "name": "dovetail_cutter",
+      "signature": "module dovetail_cutter()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/bambu-lab-a1/gantry-mount.scad",
+      "kind": "module",
+      "name": "clearance_guard",
+      "signature": "module clearance_guard()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/bambu-lab-a1/gantry-mount.scad",
+      "kind": "module",
+      "name": "a1_bracket",
+      "signature": "module a1_bracket()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/bambu-lab-a1/gantry-mount.scad",
+      "kind": "module",
+      "name": "c230_friction_dot",
+      "signature": "module c230_friction_dot(direction=1)",
+      "params": [
+        {
+          "name": "direction",
+          "default": "1"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/bambu-lab-a1/gantry-mount.scad",
+      "kind": "module",
+      "name": "c230_camera_holder",
+      "signature": "module c230_camera_holder()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/bambu-lab-a1/gantry-mount.scad",
+      "kind": "module",
+      "name": "c230_camera_arm",
+      "signature": "module c230_camera_arm()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/bambu-lab-a1/gantry-mount.scad",
+      "kind": "module",
+      "name": "mw_plate_1",
+      "signature": "module mw_plate_1()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/bambu-lab-a1/gantry-mount.scad",
+      "kind": "module",
+      "name": "mw_plate_2",
+      "signature": "module mw_plate_2()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/camera-tapo-230/wall-mount.scad",
+      "kind": "module",
+      "name": "rounded_layer",
+      "signature": "module rounded_layer(size)",
+      "params": [
+        {
+          "name": "size",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/camera-tapo-230/wall-mount.scad",
+      "kind": "module",
+      "name": "friction_dot",
+      "signature": "module friction_dot(direction=1)",
+      "params": [
+        {
+          "name": "direction",
+          "default": "1"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/camera-tapo-230/wall-mount.scad",
+      "kind": "module",
+      "name": "camera_holder",
+      "signature": "module camera_holder()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/clothes-pin/pin.scad",
+      "kind": "function",
+      "name": "grid_dim",
+      "signature": "function grid_dim(val)",
+      "params": [
+        {
+          "name": "val",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/clothes-pin/pin.scad",
+      "kind": "function",
+      "name": "eps",
+      "signature": "function eps(dim)",
+      "params": [
+        {
+          "name": "dim",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/clothes-pin/pin.scad",
+      "kind": "function",
+      "name": "tol",
+      "signature": "function tol(dim)",
+      "params": [
+        {
+          "name": "dim",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/clothes-pin/pin.scad",
+      "kind": "module",
+      "name": "see_through",
+      "signature": "module see_through(base_color=\"grey\")",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"grey\""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/clothes-pin/pin.scad",
+      "kind": "module",
+      "name": "solid",
+      "signature": "module solid(base_color=\"red\")",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"red\""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/clothes-pin/pin.scad",
+      "kind": "module",
+      "name": "chamfer_cutter",
+      "signature": "module chamfer_cutter(length)",
+      "params": [
+        {
+          "name": "length",
+          "default": ""
+        }
+      ],
+      "doc": "right-triangle cross-section (90° angle at the top apex), extruded along length"
+    },
+    {
+      "topic": "models",
+      "file": "models/clothes-pin/pin.scad",
+      "kind": "module",
+      "name": "rift_cutter",
+      "signature": "module rift_cutter(height, gap, length)",
+      "params": [
+        {
+          "name": "height",
+          "default": ""
+        },
+        {
+          "name": "gap",
+          "default": ""
+        },
+        {
+          "name": "length",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/clothes-pin/pin.scad",
+      "kind": "module",
+      "name": "grip_cutter",
+      "signature": "module grip_cutter(height, size)",
+      "params": [
+        {
+          "name": "height",
+          "default": ""
+        },
+        {
+          "name": "size",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/clothes-pin/pin.scad",
+      "kind": "module",
+      "name": "half_shape",
+      "signature": "module half_shape()",
+      "params": [],
+      "doc": "==================================================================== Main Model ===================================================================="
+    },
+    {
+      "topic": "models",
+      "file": "models/clothes-pin/pin.scad",
+      "kind": "module",
+      "name": "cross_section",
+      "signature": "module cross_section()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/clothes-pin/pin.scad",
+      "kind": "module",
+      "name": "chamfer_tool",
+      "signature": "module chamfer_tool()",
+      "params": [],
+      "doc": "a diamond (two cones tip to tip): minkowski with this bevels top/bottom edges without collapsing the concave cross_section the way hull() would"
+    },
+    {
+      "topic": "models",
+      "file": "models/clothes-pin/pin.scad",
+      "kind": "module",
+      "name": "pin_chamfers",
+      "signature": "module pin_chamfers()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/clothes-pin/pin.scad",
+      "kind": "module",
+      "name": "pin_cutters",
+      "signature": "module pin_cutters()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/clothes-pin/pin.scad",
+      "kind": "module",
+      "name": "pin_body",
+      "signature": "module pin_body()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/clothes-pin/pin.scad",
+      "kind": "module",
+      "name": "mw_plate_1",
+      "signature": "module mw_plate_1()",
+      "params": [],
+      "doc": "inside hinges"
+    },
+    {
+      "topic": "models",
+      "file": "models/eye-drops/eye-drops.scad",
+      "kind": "module",
+      "name": "rounded_rectangle",
+      "signature": "module rounded_rectangle(width, depth, height, corner_radius)",
+      "params": [
+        {
+          "name": "width",
+          "default": ""
+        },
+        {
+          "name": "depth",
+          "default": ""
+        },
+        {
+          "name": "height",
+          "default": ""
+        },
+        {
+          "name": "corner_radius",
+          "default": ""
+        }
+      ],
+      "doc": "Create the main object with rounded corners"
+    },
+    {
+      "topic": "models",
+      "file": "models/eye-drops/eye-drops.scad",
+      "kind": "module",
+      "name": "chamfered_rectangle",
+      "signature": "module chamfered_rectangle(width, depth, height, corner_radius, chamfer_size)",
+      "params": [
+        {
+          "name": "width",
+          "default": ""
+        },
+        {
+          "name": "depth",
+          "default": ""
+        },
+        {
+          "name": "height",
+          "default": ""
+        },
+        {
+          "name": "corner_radius",
+          "default": ""
+        },
+        {
+          "name": "chamfer_size",
+          "default": ""
+        }
+      ],
+      "doc": "Create the main object with chamfers"
+    },
+    {
+      "topic": "models",
+      "file": "models/eye-drops/eye-drops.scad",
+      "kind": "module",
+      "name": "holes",
+      "signature": "module holes()",
+      "params": [],
+      "doc": "Create the holes"
+    },
+    {
+      "topic": "models",
+      "file": "models/eye-drops/eye-drops.scad",
+      "kind": "module",
+      "name": "corner_holes",
+      "signature": "module corner_holes()",
+      "params": [],
+      "doc": "Create the corner holes"
+    },
+    {
+      "topic": "models",
+      "file": "models/hinged-box/box.scad",
+      "kind": "function",
+      "name": "grid_dim",
+      "signature": "function grid_dim(val)",
+      "params": [
+        {
+          "name": "val",
+          "default": ""
+        }
+      ],
+      "doc": "==================================================================== Model Parts ===================================================================="
+    },
+    {
+      "topic": "models",
+      "file": "models/hinged-box/box.scad",
+      "kind": "function",
+      "name": "eps",
+      "signature": "function eps(dim)",
+      "params": [
+        {
+          "name": "dim",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/hinged-box/box.scad",
+      "kind": "function",
+      "name": "tol",
+      "signature": "function tol(dim)",
+      "params": [
+        {
+          "name": "dim",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/hinged-box/box.scad",
+      "kind": "module",
+      "name": "box_grid",
+      "signature": "module box_grid()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/hinged-box/box.scad",
+      "kind": "module",
+      "name": "snap_lock",
+      "signature": "module snap_lock()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/hinged-box/box.scad",
+      "kind": "module",
+      "name": "box_lid",
+      "signature": "module box_lid()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/hinged-box/box.scad",
+      "kind": "module",
+      "name": "box_body",
+      "signature": "module box_body()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/hinged-box/box.scad",
+      "kind": "module",
+      "name": "hinge_row",
+      "signature": "module hinge_row()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/hinged-box/box.scad",
+      "kind": "module",
+      "name": "end_cap",
+      "signature": "module end_cap()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/hinged-box/box.scad",
+      "kind": "module",
+      "name": "hinged_box",
+      "signature": "module hinged_box()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/hinged-box/box.scad",
+      "kind": "module",
+      "name": "mw_plate_1",
+      "signature": "module mw_plate_1()",
+      "params": [],
+      "doc": "inside hinges"
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/lampbase.scad",
+      "kind": "module",
+      "name": "see_through",
+      "signature": "module see_through(base_color=\"grey\")",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"grey\""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/lampbase.scad",
+      "kind": "module",
+      "name": "solid",
+      "signature": "module solid(base_color=\"red\")",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"red\""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/lampbase.scad",
+      "kind": "module",
+      "name": "torus",
+      "signature": "module torus(radius, rx, ry, arc=360)",
+      "params": [
+        {
+          "name": "radius",
+          "default": ""
+        },
+        {
+          "name": "rx",
+          "default": ""
+        },
+        {
+          "name": "ry",
+          "default": ""
+        },
+        {
+          "name": "arc",
+          "default": "360"
+        }
+      ],
+      "doc": "rotational extrusion of an ellipsoid with its center at `radius`"
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/lampbase.scad",
+      "kind": "module",
+      "name": "twist2lock",
+      "signature": "module twist2lock()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/lampbase.scad",
+      "kind": "module",
+      "name": "one_lug",
+      "signature": "module one_lug(radius, angle=0, arc_scale=1, slot=false)",
+      "params": [
+        {
+          "name": "radius",
+          "default": ""
+        },
+        {
+          "name": "angle",
+          "default": "0"
+        },
+        {
+          "name": "arc_scale",
+          "default": "1"
+        },
+        {
+          "name": "slot",
+          "default": "false"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/lampbase.scad",
+      "kind": "module",
+      "name": "all_lugs",
+      "signature": "module all_lugs(radius, arc_scale=1, slot=false)",
+      "params": [
+        {
+          "name": "radius",
+          "default": ""
+        },
+        {
+          "name": "arc_scale",
+          "default": "1"
+        },
+        {
+          "name": "slot",
+          "default": "false"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/lampbase.scad",
+      "kind": "module",
+      "name": "led_holder",
+      "signature": "module led_holder()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/lampbase.scad",
+      "kind": "module",
+      "name": "lamp_base",
+      "signature": "module lamp_base()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/lampbase.scad",
+      "kind": "module",
+      "name": "mw_plate_1",
+      "signature": "module mw_plate_1()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/lampbase.scad",
+      "kind": "module",
+      "name": "mw_plate_2",
+      "signature": "module mw_plate_2()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shade-base-connector.scad",
+      "kind": "module",
+      "name": "torus",
+      "signature": "module torus(radius, rx, ry, arc=360)",
+      "params": [
+        {
+          "name": "radius",
+          "default": ""
+        },
+        {
+          "name": "rx",
+          "default": ""
+        },
+        {
+          "name": "ry",
+          "default": ""
+        },
+        {
+          "name": "arc",
+          "default": "360"
+        }
+      ],
+      "doc": "Rotational extrusion of an ellipsoid with its center at `radius`"
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shade-base-connector.scad",
+      "kind": "module",
+      "name": "tongue_slots",
+      "signature": "module tongue_slots()",
+      "params": [],
+      "doc": "Tongue slots for better friction fit"
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shade-base-connector.scad",
+      "kind": "module",
+      "name": "friction_dots",
+      "signature": "module friction_dots()",
+      "params": [],
+      "doc": "Elliptical bumps to increase compliance, placed on the outside of the tongues"
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shade-base-connector.scad",
+      "kind": "module",
+      "name": "lamp_connector",
+      "signature": "module lamp_connector()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shade-base-connector.scad",
+      "kind": "module",
+      "name": "mw_plate_1",
+      "signature": "module mw_plate_1()",
+      "params": [],
+      "doc": "Plate 1 on MakerWorld (via magic naming)"
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/lampshade.scad",
+      "kind": "module",
+      "name": "see_through",
+      "signature": "module see_through(base_color=\"grey\")",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"grey\""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/lampshade.scad",
+      "kind": "module",
+      "name": "solid",
+      "signature": "module solid(base_color=\"red\")",
+      "params": [
+        {
+          "name": "base_color",
+          "default": "\"red\""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/lampshade.scad",
+      "kind": "module",
+      "name": "chamfered_cube",
+      "signature": "module chamfered_cube(width, depth, height, chamfer)",
+      "params": [
+        {
+          "name": "width",
+          "default": ""
+        },
+        {
+          "name": "depth",
+          "default": ""
+        },
+        {
+          "name": "height",
+          "default": ""
+        },
+        {
+          "name": "chamfer",
+          "default": ""
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/lampshade.scad",
+      "kind": "module",
+      "name": "shade_cap",
+      "signature": "module shade_cap(width=shade_size - lamp_corner_radius, cap_height=5, bump_height=4, box_height=.6, corner_radius=lamp_corner_radius, chamfer_size=lamp_chamfer * 2 / 3)",
+      "params": [
+        {
+          "name": "width",
+          "default": "shade_size - lamp_corner_radius"
+        },
+        {
+          "name": "cap_height",
+          "default": "5"
+        },
+        {
+          "name": "bump_height",
+          "default": "4"
+        },
+        {
+          "name": "box_height",
+          "default": ".6"
+        },
+        {
+          "name": "corner_radius",
+          "default": "lamp_corner_radius"
+        },
+        {
+          "name": "chamfer_size",
+          "default": "lamp_chamfer * 2 / 3"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/lampshade.scad",
+      "kind": "module",
+      "name": "shade_struts",
+      "signature": "module shade_struts(width=shade_size)",
+      "params": [
+        {
+          "name": "width",
+          "default": "shade_size"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/lampshade.scad",
+      "kind": "module",
+      "name": "lamp_body",
+      "signature": "module lamp_body()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/lampshade.scad",
+      "kind": "module",
+      "name": "lamp_shade",
+      "signature": "module lamp_shade()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/lampshade.scad",
+      "kind": "module",
+      "name": "mw_plate_1",
+      "signature": "module mw_plate_1()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/round-image.scad",
+      "kind": "module",
+      "name": "torus",
+      "signature": "module torus(radius, rx, ry, arc=360)",
+      "params": [
+        {
+          "name": "radius",
+          "default": ""
+        },
+        {
+          "name": "rx",
+          "default": ""
+        },
+        {
+          "name": "ry",
+          "default": ""
+        },
+        {
+          "name": "arc",
+          "default": "360"
+        }
+      ],
+      "doc": "rotational extrusion of an ellipsoid with its center at `radius`"
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/round-image.scad",
+      "kind": "module",
+      "name": "svg_profile",
+      "signature": "module svg_profile(d=0)",
+      "params": [
+        {
+          "name": "d",
+          "default": "0"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/round-image.scad",
+      "kind": "module",
+      "name": "lamp_shade",
+      "signature": "module lamp_shade()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/round-image.scad",
+      "kind": "module",
+      "name": "mw_plate_1",
+      "signature": "module mw_plate_1()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/round-textured.scad",
+      "kind": "module",
+      "name": "shade_top",
+      "signature": "module shade_top(tex, tex_param)",
+      "params": [
+        {
+          "name": "tex",
+          "default": ""
+        },
+        {
+          "name": "tex_param",
+          "default": ""
+        }
+      ],
+      "doc": "the top plate (placed on the print bed)"
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/round-textured.scad",
+      "kind": "module",
+      "name": "cap_dots",
+      "signature": "module cap_dots()",
+      "params": [],
+      "doc": "Friction dots for the cap"
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/round-textured.scad",
+      "kind": "module",
+      "name": "tongue_slots",
+      "signature": "module tongue_slots()",
+      "params": [],
+      "doc": "Tongue slots for better friction fit"
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/round-textured.scad",
+      "kind": "module",
+      "name": "friction_dots",
+      "signature": "module friction_dots()",
+      "params": [],
+      "doc": "Elliptical bumps to increase compliance, placed on the outside of the tongues"
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/round-textured.scad",
+      "kind": "module",
+      "name": "lamp_connector",
+      "signature": "module lamp_connector()",
+      "params": [],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/round-textured.scad",
+      "kind": "module",
+      "name": "lamp_shade",
+      "signature": "module lamp_shade(tex_param=tex_config[texture_id])",
+      "params": [
+        {
+          "name": "tex_param",
+          "default": "tex_config[texture_id]"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/round-textured.scad",
+      "kind": "module",
+      "name": "mw_plate_1",
+      "signature": "module mw_plate_1()",
+      "params": [],
+      "doc": "Plate 1: Shade Body"
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/round-textured.scad",
+      "kind": "module",
+      "name": "mw_plate_2",
+      "signature": "module mw_plate_2()",
+      "params": [],
+      "doc": "Plate 2: Plain (non-textured) Cap"
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/round-textured.scad",
+      "kind": "module",
+      "name": "mw_plate_3",
+      "signature": "module mw_plate_3()",
+      "params": [],
+      "doc": "Plate 3: Thick plain (non-textured) Cap"
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/round-textured.scad",
+      "kind": "module",
+      "name": "mw_plate_4",
+      "signature": "module mw_plate_4()",
+      "params": [],
+      "doc": "Plate 4: Textured Cap"
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/wide-round-textured.scad",
+      "kind": "module",
+      "name": "torus",
+      "signature": "module torus(radius, rx, ry, arc=360)",
+      "params": [
+        {
+          "name": "radius",
+          "default": ""
+        },
+        {
+          "name": "rx",
+          "default": ""
+        },
+        {
+          "name": "ry",
+          "default": ""
+        },
+        {
+          "name": "arc",
+          "default": "360"
+        }
+      ],
+      "doc": "rotational extrusion of an ellipsoid with its center at `radius`"
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/wide-round-textured.scad",
+      "kind": "module",
+      "name": "shade_top",
+      "signature": "module shade_top(tex, tex_param, with_top=!topless, orientation=upright)",
+      "params": [
+        {
+          "name": "tex",
+          "default": ""
+        },
+        {
+          "name": "tex_param",
+          "default": ""
+        },
+        {
+          "name": "with_top",
+          "default": "!topless"
+        },
+        {
+          "name": "orientation",
+          "default": "upright"
+        }
+      ],
+      "doc": "the top plate (placed on the print bed)"
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/wide-round-textured.scad",
+      "kind": "module",
+      "name": "shade_bottom",
+      "signature": "module shade_bottom()",
+      "params": [],
+      "doc": "the bottom plate and connecting hole"
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/wide-round-textured.scad",
+      "kind": "module",
+      "name": "cap_dots",
+      "signature": "module cap_dots()",
+      "params": [],
+      "doc": "Friction dots for the cap"
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/wide-round-textured.scad",
+      "kind": "module",
+      "name": "lamp_shade",
+      "signature": "module lamp_shade(tex_param=tex_config[texture_id])",
+      "params": [
+        {
+          "name": "tex_param",
+          "default": "tex_config[texture_id]"
+        }
+      ],
+      "doc": ""
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/wide-round-textured.scad",
+      "kind": "module",
+      "name": "mw_plate_1",
+      "signature": "module mw_plate_1()",
+      "params": [],
+      "doc": "Plate 1: Shade Body"
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/wide-round-textured.scad",
+      "kind": "module",
+      "name": "mw_plate_2",
+      "signature": "module mw_plate_2()",
+      "params": [],
+      "doc": "Plate 2: Textured Cap"
+    },
+    {
+      "topic": "models",
+      "file": "models/lamp-led-puck/shades/wide-round-textured.scad",
+      "kind": "module",
+      "name": "mw_plate_3",
+      "signature": "module mw_plate_3()",
+      "params": [],
+      "doc": "Plate 3: Cap with SVG Image (TODO)"
+    }
+  ]
+}

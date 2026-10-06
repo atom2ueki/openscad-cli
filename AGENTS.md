@@ -8,12 +8,13 @@ on structured results instead of scraping logs.
 
 - Install deps: `npm ci` (Node ≥ 20; `npm install` if you are changing deps)
 - Build:        `npm run build`          → `dist/` (ES modules, zero runtime deps)
-- Test:         `npm test`               → 55 tests; engine tests skip if no engine
+- Test:         `npm test`               → 63 tests; engine tests skip if no engine
 - Test w/ engine: `OPENSCAD_ENGINE=<path> npm run test:integration`
 - Typecheck:    `npm run typecheck`      (TypeScript strict, `noUncheckedIndexedAccess`)
 - Compliance:   `npm run compliance`     (9-point GPL gate; must pass to release)
 - Build engine: `packaging/build-engine.sh full|lite`  (needs cmake + native deps)
 - Install skill: `packaging/install-skill.sh`
+- Fetch/extend the knowledge base: `scripts/kb/fetch-upstream.sh` then `node scripts/kb/generate.mjs`
 
 On a machine with no Node/Homebrew, `source .tools/env.sh` first: it puts the
 project-local Node on PATH and points `OPENSCAD_ENGINE` at a downloaded nightly.
@@ -25,9 +26,12 @@ project-local Node on PATH and points `OPENSCAD_ENGINE` at a downloaded nightly.
   `commands/` one module per command, `util/` helpers
 - `engine/` — **git submodule**: the pinned OpenSCAD source. Do not edit
 - `packaging/` — build-engine.sh, source tarball, install-skill.sh, Homebrew, AppImage, Docker
-- `skill/` — the agent skill; source of truth, also printed by `openscad-cli skill`
+- `skill/` — the agent skill; source of truth, also printed by `openscad-cli skill`.
+  `skill/references/` is the CLI's own manual; `skill/kb/` is the design corpus
+  (hand-written topic pages plus a generated `catalog.{md,json}`)
 - `test/` — `unit.core.test.js` (no engine), `integration.build.test.js` (real engine), `fixtures/`
-- `scripts/` — licence-header lint and the compliance gate
+- `scripts/` — licence-header lint and the compliance gate; `scripts/kb/`
+  fetches and catalogues the upstream model corpus
 - `.github/workflows/` — `ci` (test), `compliance` (GPL gate), `release`
 
 ## Code style
@@ -61,6 +65,9 @@ project-local Node on PATH and points `OPENSCAD_ENGINE` at a downloaded nightly.
 - Unit tests (`test/unit.core.test.js`) cover the engine-facing logic against
   real captured output: diagnostics parsing, cache keys, deps-file parsing, mesh
   maths, argument rejection. No engine needed — keep it that way.
+- `test/unit.kb.test.js` guards the knowledge base's structure: no dead link and
+  no orphan page under `skill/kb/`, the generated catalogue matching its topics,
+  and `install-skill.sh` really installing the nested tree.
 - Integration tests need a real engine and skip cleanly without one.
 - **Add a test for every behaviour change**, especially any claim about what the
   engine prints. Verify a claim against the real engine before encoding it.
@@ -81,6 +88,9 @@ Bumping is release-visible: it changes the cache key and appears in `info`.
   `packaging/install-skill.sh` — the skill must never document a flag that does
   not exist
 - Keep the engine submodule pinned unless the PR is explicitly an engine bump
+- `skill/kb/catalog.{md,json}` are generated. Never hand-edit them: change
+  `scripts/kb/generate.mjs`, then regenerate. A corpus bump is the pinned commit
+  in `scripts/kb/fetch-upstream.sh` plus a regenerate, in one commit
 
 ## Security and licensing
 
