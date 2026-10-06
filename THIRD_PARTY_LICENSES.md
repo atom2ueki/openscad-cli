@@ -70,6 +70,20 @@ These are resolved at build time and linked into the engine binary:
 | lib3mf | LGPL-2.1-or-later | 3MF export/import |
 | flex, bison | FSFPL / GPL-2.0-or-later | generating the SCAD parser |
 
+## Documentation derived from third-party work
+
+### jhermann/things — the skill knowledge base
+
+- Upstream: <https://github.com/jhermann/things>
+- Copyright: Copyright (c) the `things` authors
+- License: **Apache-2.0**
+- Relation: the pages under `skill/kb/` are written here, but they describe and
+  catalogue the models, reusable parts and design notes of that repository, and
+  `skill/kb/catalog.md` reproduces its `module` and `function` signatures
+  verbatim. `skill/kb/catalog.json` records the upstream commit they were taken
+  from. No upstream file is redistributed, and no upstream binary asset is
+  copied; `scripts/kb/fetch-upstream.sh` retrieves the source on demand.
+
 ## Our own dependencies
 
 The npm package ships **pure JavaScript with zero runtime dependencies**. The

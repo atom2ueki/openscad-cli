@@ -226,3 +226,16 @@ model adjustable, and what `variants --param` then sweeps.
 - `references/commands.md` — every flag, and what the JSON contains
 - `references/design.md` — printability rules for real parts
 - `references/troubleshooting.md` — every diagnostic code, cause and fix
+
+## Knowledge base
+
+`kb/` is a distilled corpus of proven parametric designs — threads, springs,
+joins, print-in-place mechanisms, surface textures, hull constructions, BOSL2
+idioms — with the exact numbers and the failure modes their authors documented.
+
+Start at **`kb/INDEX.md`** and follow its routing table; do not read the whole
+directory. It opens with the two rules that decide most print failures and a
+table of the non-negotiable numbers. Reach for it before designing any threaded
+pair, spring, hinge, join or textured grip from scratch, and copy the technique
+rather than re-deriving it. `kb/catalog.md` lists every reusable module with its
+parameters, generated from the upstream sources.
